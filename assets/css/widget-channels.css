@@ -1,0 +1,49 @@
+/* HABIO Widget - Channel Styles */
+.habio-channel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  font-size: 14px;
+}
+
+.habio-channel:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.habio-channel--primary {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.habio-channel--primary:hover {
+  background: #0056b3;
+}
+
+.habio-channel--secondary {
+  flex-direction: column;
+  text-align: center;
+  padding: 8px;
+}
+
+.habio-channel__icon {
+  font-size: 20px;
+}
+
+.habio-channel__label {
+  font-weight: 500;
+}
+
+.habio-channel__badge {
+  font-size: 10px;
+  opacity: 0.8;
+  margin-top: 2px;
+}

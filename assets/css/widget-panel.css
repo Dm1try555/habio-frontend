@@ -1,0 +1,55 @@
+/* HABIO Widget - Panel Styles */
+.habio-panel__header {
+  padding: 16px;
+  border-bottom: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.habio-panel__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+}
+
+.habio-panel__badge {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.habio-panel__content {
+  padding: 16px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.habio-panel__top-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.habio-panel__other-channels {
+  margin-top: 16px;
+}
+
+.habio-panel__subtitle {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.habio-panel__channels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .habio-panel__channels-grid {
+    grid-template-columns: 1fr;
+  }
+}

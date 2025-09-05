@@ -154,10 +154,13 @@
                 <th>ID</th>
                 <th>Проект</th>
                 <th>Канал</th>
-                <th>Контакт</th>
+                <th>Имя</th>
+                <th>Email</th>
+                <th>Телефон</th>
                 <th>Сообщение</th>
                 <th>Дата создания</th>
                 <th>Статус</th>
+                <th>Действия</th>
               </tr>
             </thead>
             <tbody>
@@ -165,17 +168,91 @@
                 <td>{{ lead.id }}</td>
                 <td>{{ getProjectName(lead.project) }}</td>
                 <td>{{ getChannelName(lead.channel) }}</td>
-                <td>{{ lead.contact }}</td>
-                <td>{{ lead.message || '-' }}</td>
+                <td>{{ getContactName(lead.contact) }}</td>
+                <td>{{ getContactEmail(lead.contact) }}</td>
+                <td>{{ getContactPhone(lead.message) }}</td>
+                <td>{{ getContactMessage(lead.message) }}</td>
                 <td>{{ formatDate(lead.created_at) }}</td>
                 <td>
-                  <span :class="['status', lead.processed ? 'status--processed' : 'status--pending']">
+                  <label class="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      :checked="lead.processed"
+                      @change="toggleLeadStatus(lead.id, $event.target.checked)"
+                    />
+                    <span class="toggle-slider"></span>
+                  </label>
+                  <span class="status-text">
                     {{ lead.processed ? 'Обработан' : 'В ожидании' }}
                   </span>
+                </td>
+                <td>
+                  <button @click="deleteLead(lead.id)" class="btn btn--danger btn--small">
+                    Удалить
+                  </button>
                 </td>
               </tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- Chat Tab -->
+      <div v-if="activeTab === 'chat'" class="admin-section">
+        <div class="admin-section__header">
+          <h2>Чат с клиентами</h2>
+        </div>
+        
+        <div class="chat-container">
+          <div class="chat-sessions">
+            <h3>Активные сессии</h3>
+            <div class="sessions-list">
+              <div
+                v-for="session in chatSessions"
+                :key="session.id"
+                :class="['session-item', { 'session-item--active': selectedSession?.id === session.id }]"
+                @click="selectSession(session)"
+              >
+                <div class="session-info">
+                  <div class="session-client">{{ session.client_id }}</div>
+                  <div class="session-time">{{ formatDate(session.updated_at) }}</div>
+                </div>
+                <div class="session-status">
+                  <span :class="['status-dot', session.is_active ? 'status-dot--active' : 'status-dot--inactive']"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="chat-messages" v-if="selectedSession">
+            <div class="chat-header">
+              <h4>Сессия {{ selectedSession.id }}</h4>
+              <button @click="selectedSession = null" class="btn btn--small">Закрыть</button>
+            </div>
+            
+            <div class="messages-container" ref="messagesContainer">
+              <div
+                v-for="message in chatMessages"
+                :key="message.id"
+                :class="['message', `message--${message.message_type}`]"
+              >
+                <div class="message-content">{{ message.content }}</div>
+                <div class="message-time">{{ formatTime(message.created_at) }}</div>
+              </div>
+            </div>
+            
+            <div class="message-input">
+              <form @submit.prevent="sendAdminMessage">
+                <input
+                  v-model="newMessage"
+                  type="text"
+                  placeholder="Введите сообщение..."
+                  class="message-field"
+                />
+                <button type="submit" class="btn btn--primary btn--small">Отправить</button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
     </main>
@@ -243,6 +320,10 @@
             <label>Ссылка</label>
             <input v-model="channelForm.link" type="url" />
           </div>
+          <div v-if="channelForm.type === 'call'" class="form-group">
+            <label>Номер телефона</label>
+            <input v-model="channelForm.phone_number" type="tel" placeholder="+1 (555) 123-4567" />
+          </div>
           <div class="form-group">
             <label>Приоритет</label>
             <input v-model="channelForm.priority" type="number" min="0" />
@@ -266,6 +347,53 @@
         </form>
       </div>
     </div>
+
+    <!-- Schedule Form Modal -->
+    <div v-if="showScheduleForm" class="modal">
+      <div class="modal__content">
+        <h3>{{ editingSchedule ? 'Редактировать расписание' : 'Добавить расписание' }}</h3>
+        <form @submit.prevent="saveSchedule">
+          <div class="form-group">
+            <label>Проект</label>
+            <select v-model="scheduleForm.project" required>
+              <option v-for="project in projects" :key="project.id" :value="project.id">
+                {{ project.name }}
+              </option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>День недели</label>
+            <select v-model="scheduleForm.day" required>
+              <option value="monday">Понедельник</option>
+              <option value="tuesday">Вторник</option>
+              <option value="wednesday">Среда</option>
+              <option value="thursday">Четверг</option>
+              <option value="friday">Пятница</option>
+              <option value="saturday">Суббота</option>
+              <option value="sunday">Воскресенье</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Время начала</label>
+            <input v-model="scheduleForm.start_time" type="time" required />
+          </div>
+          <div class="form-group">
+            <label>Время окончания</label>
+            <input v-model="scheduleForm.end_time" type="time" required />
+          </div>
+          <div class="form-group">
+            <label>
+              <input v-model="scheduleForm.is_working_day" type="checkbox" />
+              Рабочий день
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn--primary">Сохранить</button>
+            <button type="button" @click="closeScheduleForm" class="btn btn--secondary">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -277,13 +405,18 @@ const tabs = [
   { id: 'projects', label: 'Проекты' },
   { id: 'channels', label: 'Каналы' },
   { id: 'schedule', label: 'Расписание' },
-  { id: 'leads', label: 'Лиды' }
+  { id: 'leads', label: 'Лиды' },
+  { id: 'chat', label: 'Чат' }
 ]
 
 const projects = ref([])
 const channels = ref([])
 const schedules = ref([])
 const leads = ref([])
+const chatSessions = ref([])
+const selectedSession = ref(null)
+const chatMessages = ref([])
+const newMessage = ref('')
 
 const showProjectForm = ref(false)
 const showChannelForm = ref(false)
@@ -304,26 +437,37 @@ const channelForm = ref({
   type: 'call',
   label: '',
   link: '',
+  phone_number: '',
   priority: 0,
   show_in_top: false,
   is_active: true
+})
+
+const scheduleForm = ref({
+  project: 1,
+  day: 'monday',
+  start_time: '09:00',
+  end_time: '18:00',
+  is_working_day: true
 })
 
 const apiBase = 'http://127.0.0.1:8000/api'
 
 const loadData = async () => {
   try {
-    const [projectsRes, channelsRes, schedulesRes, leadsRes] = await Promise.all([
+    const [projectsRes, channelsRes, schedulesRes, leadsRes, chatSessionsRes] = await Promise.all([
       fetch(`${apiBase}/projects/`),
       fetch(`${apiBase}/channels/`),
       fetch(`${apiBase}/schedules/`),
-      fetch(`${apiBase}/leads/`)
+      fetch(`${apiBase}/leads/`),
+      fetch(`${apiBase}/chat-sessions/`)
     ])
     
     projects.value = await projectsRes.json()
     channels.value = await channelsRes.json()
     schedules.value = await schedulesRes.json()
     leads.value = await leadsRes.json()
+    chatSessions.value = await chatSessionsRes.json()
   } catch (error) {
     console.error('Failed to load data:', error)
   }
@@ -364,7 +508,10 @@ const editProject = (project) => {
 
 const editChannel = (channel) => {
   editingChannel.value = channel
-  channelForm.value = { ...channel }
+  channelForm.value = { 
+    ...channel,
+    phone_number: channel.phone_number || ''
+  }
   showChannelForm.value = true
 }
 
@@ -451,236 +598,174 @@ const closeChannelForm = () => {
 onMounted(() => {
   loadData()
 })
+
+// Lead management functions
+const getContactName = (contact) => {
+  if (!contact) return '-'
+  const match = contact.match(/^([^<]+)/)
+  return match ? match[1].trim() : contact
+}
+
+const getContactEmail = (contact) => {
+  if (!contact) return '-'
+  const match = contact.match(/<([^>]+)>/)
+  return match ? match[1].trim() : '-'
+}
+
+const getContactPhone = (message) => {
+  if (!message) return '-'
+  const phoneMatch = message.match(/Телефон:\s*([^\n]+)/)
+  return phoneMatch ? phoneMatch[1].trim() : '-'
+}
+
+const getContactMessage = (message) => {
+  if (!message) return '-'
+  // Remove phone line from message
+  return message.replace(/Телефон:\s*[^\n]+\n?\n?/, '').trim() || '-'
+}
+
+const toggleLeadStatus = async (leadId, processed) => {
+  try {
+    const response = await fetch(`${apiBase}/leads/${leadId}/`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ processed })
+    })
+    
+    if (response.ok) {
+      await loadData()
+    } else {
+      console.error('Failed to update lead status')
+    }
+  } catch (error) {
+    console.error('Failed to update lead status:', error)
+  }
+}
+
+const deleteLead = async (leadId) => {
+  if (confirm('Удалить лид?')) {
+    try {
+      await fetch(`${apiBase}/leads/${leadId}/`, { method: 'DELETE' })
+      await loadData()
+    } catch (error) {
+      console.error('Failed to delete lead:', error)
+    }
+  }
+}
+
+// Schedule management functions
+const editSchedule = (schedule) => {
+  editingSchedule.value = schedule
+  scheduleForm.value = {
+    project: schedule.project,
+    day: schedule.day,
+    start_time: schedule.start_time,
+    end_time: schedule.end_time,
+    is_working_day: schedule.is_working_day
+  }
+  showScheduleForm.value = true
+}
+
+const saveSchedule = async () => {
+  try {
+    const url = editingSchedule.value 
+      ? `${apiBase}/schedules/${editingSchedule.value.id}/`
+      : `${apiBase}/schedules/`
+    
+    const method = editingSchedule.value ? 'PUT' : 'POST'
+    
+    const response = await fetch(url, {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(scheduleForm.value)
+    })
+    
+    if (response.ok) {
+      await loadData()
+      closeScheduleForm()
+    }
+  } catch (error) {
+    console.error('Failed to save schedule:', error)
+  }
+}
+
+const deleteSchedule = async (id) => {
+  if (confirm('Удалить расписание?')) {
+    try {
+      await fetch(`${apiBase}/schedules/${id}/`, { method: 'DELETE' })
+      await loadData()
+    } catch (error) {
+      console.error('Failed to delete schedule:', error)
+    }
+  }
+}
+
+const closeScheduleForm = () => {
+  showScheduleForm.value = false
+  editingSchedule.value = null
+  scheduleForm.value = { 
+    project: 1, 
+    day: 'monday', 
+    start_time: '09:00', 
+    end_time: '18:00', 
+    is_working_day: true 
+  }
+}
+
+// Chat management functions
+const selectSession = async (session) => {
+  selectedSession.value = session
+  await loadChatMessages(session.id)
+}
+
+const loadChatMessages = async (sessionId) => {
+  try {
+    const response = await fetch(`${apiBase}/chat-sessions/${sessionId}/messages/`)
+    if (response.ok) {
+      chatMessages.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Failed to load chat messages:', error)
+  }
+}
+
+const sendAdminMessage = async () => {
+  if (!newMessage.value.trim() || !selectedSession.value) return
+  
+  try {
+    const response = await fetch(`${apiBase}/chat-messages/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        session: selectedSession.value.id,
+        message_type: 'admin',
+        content: newMessage.value.trim()
+      })
+    })
+    
+    if (response.ok) {
+      const message = await response.json()
+      chatMessages.value.push(message)
+      newMessage.value = ''
+    }
+  } catch (error) {
+    console.error('Failed to send message:', error)
+  }
+}
+
+const formatTime = (timestamp) => {
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('ru-RU', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  })
+}
 </script>
 
 <style scoped>
-.admin-page {
-  min-height: 100vh;
-  background: #f8f9fa;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-.admin-header {
-  background: white;
-  border-bottom: 1px solid #e9ecef;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.admin-header h1 {
-  margin: 0 0 20px 0;
-  color: #212529;
-  font-size: 2rem;
-}
-
-.admin-nav {
-  display: flex;
-  gap: 8px;
-}
-
-.admin-nav__tab {
-  padding: 8px 16px;
-  border: 1px solid #dee2e6;
-  background: white;
-  color: #495057;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: all 0.2s;
-}
-
-.admin-nav__tab:hover {
-  background: #e9ecef;
-}
-
-.admin-nav__tab--active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.admin-content {
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.admin-section {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.admin-section__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.admin-section__header h2 {
-  margin: 0;
-  color: #212529;
-}
-
-.admin-table {
-  overflow-x: auto;
-}
-
-.admin-table table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-table th,
-.admin-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #dee2e6;
-}
-
-.admin-table th {
-  background: #f8f9fa;
-  font-weight: 600;
-  color: #495057;
-}
-
-.status {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.status--active {
-  background: #d4edda;
-  color: #155724;
-}
-
-.status--inactive {
-  background: #f8d7da;
-  color: #721c24;
-}
-
-.status--processed {
-  background: #d1ecf1;
-  color: #0c5460;
-}
-
-.status--pending {
-  background: #fff3cd;
-  color: #856404;
-}
-
-.btn {
-  padding: 8px 16px;
-  border: 1px solid #dee2e6;
-  border-radius: 4px;
-  background: white;
-  color: #495057;
-  cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.2s;
-}
-
-.btn:hover {
-  background: #e9ecef;
-}
-
-.btn--primary {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.btn--primary:hover {
-  background: #0056b3;
-}
-
-.btn--secondary {
-  background: #6c757d;
-  color: white;
-  border-color: #6c757d;
-}
-
-.btn--secondary:hover {
-  background: #545b62;
-}
-
-.btn--danger {
-  background: #dc3545;
-  color: white;
-  border-color: #dc3545;
-}
-
-.btn--danger:hover {
-  background: #c82333;
-}
-
-.btn--small {
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  margin-right: 4px;
-}
-
-.modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal__content {
-  background: white;
-  border-radius: 8px;
-  padding: 24px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.modal__content h3 {
-  margin: 0 0 20px 0;
-  color: #212529;
-}
-
-.form-group {
-  margin-bottom: 16px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 500;
-  color: #495057;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 0.875rem;
-}
-
-.form-group input[type="checkbox"] {
-  width: auto;
-  margin-right: 8px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  margin-top: 24px;
-}
+@import '~/assets/css/admin-base.css';
+@import '~/assets/css/admin-tables.css';
+@import '~/assets/css/admin-buttons.css';
+@import '~/assets/css/admin-modals.css';
+@import '~/assets/css/admin-chat.css';
 </style>

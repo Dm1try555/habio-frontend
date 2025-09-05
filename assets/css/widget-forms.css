@@ -1,0 +1,221 @@
+/* HABIO Widget - Form Styles */
+.habio-callback-form {
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border-radius: 12px;
+  border: 1px solid #ffcc02;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.habio-callback-form .habio-panel__subtitle {
+  color: #f57c00;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.habio-form__group {
+  margin-bottom: 12px;
+}
+
+.habio-form__input,
+.habio-form__textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: white;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.habio-form__input:focus,
+.habio-form__textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.habio-form__input::placeholder,
+.habio-form__textarea::placeholder {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.habio-form__submit {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.habio-form__submit:hover {
+  background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(40, 167, 69, 0.4);
+}
+
+.habio-form__submit:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.habio-form__submit:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Form Headers */
+.habio-form__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.habio-form__back {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 2px solid #dee2e6;
+  color: #6c757d;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.habio-form__back:hover {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  color: #495057;
+  border-color: #adb5bd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat and Lead Forms */
+.habio-chat-form,
+.habio-lead-form {
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.habio-chat-form .habio-panel__subtitle,
+.habio-lead-form .habio-panel__subtitle {
+  color: #495057;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.habio-chat-form .habio-form__textarea,
+.habio-lead-form .habio-form__textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.habio-chat-form .habio-form__input,
+.habio-lead-form .habio-form__input {
+  background: white;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.habio-chat-form .habio-form__input:focus,
+.habio-lead-form .habio-form__input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.habio-chat-form .habio-form__textarea,
+.habio-lead-form .habio-form__textarea {
+  background: white;
+  border: 2px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.habio-chat-form .habio-form__textarea:focus,
+.habio-lead-form .habio-form__textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+.habio-chat-form .habio-form__submit,
+.habio-lead-form .habio-form__submit {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.habio-chat-form .habio-form__submit:hover,
+.habio-lead-form .habio-form__submit:hover {
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 123, 255, 0.4);
+}
+
+.habio-chat-form .habio-form__submit:active,
+.habio-lead-form .habio-form__submit:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+}
+
+.habio-chat-form .habio-form__submit:disabled,
+.habio-lead-form .habio-form__submit:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Special styling for chat form */
+.habio-chat-form {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  border-color: #90caf9;
+}
+
+.habio-chat-form .habio-panel__subtitle {
+  color: #1976d2;
+}
+
+/* Special styling for lead form */
+.habio-lead-form {
+  background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+  border-color: #ce93d8;
+}
+
+.habio-lead-form .habio-panel__subtitle {
+  color: #7b1fa2;
+}
