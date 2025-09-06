@@ -37,6 +37,13 @@
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
 
+interface ChatMessage {
+  id: number
+  content: string
+  message_type: 'user' | 'admin' | 'system'
+  created_at: string
+}
+
 const props = defineProps<{
   projectId: string
   apiBase: string
@@ -48,12 +55,12 @@ const emit = defineEmits<{
 
 const { trackEvent, getClientId } = useWidgetAnalytics()
 
-const messages = ref([])
+const messages = ref<ChatMessage[]>([])
 const newMessage = ref('')
 const loading = ref(false)
-const sessionId = ref(null)
-const messagesContainer = ref(null)
-let pollInterval = null
+const sessionId = ref<string | null>(null)
+const messagesContainer = ref<HTMLElement | null>(null)
+let pollInterval: number | null = null
 
 onMounted(async () => {
   await startChat()
@@ -133,7 +140,7 @@ const loadMessages = async () => {
     )
     
     if (response.ok) {
-      const data = await response.json()
+      const data: ChatMessage[] = await response.json()
       const oldLength = messages.value.length
       messages.value = data
       
@@ -158,7 +165,7 @@ const scrollToBottom = () => {
   }
 }
 
-const formatTime = (timestamp) => {
+const formatTime = (timestamp: string) => {
   const date = new Date(timestamp)
   return date.toLocaleTimeString('ru-RU', { 
     hour: '2-digit', 
@@ -168,129 +175,5 @@ const formatTime = (timestamp) => {
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-forms.css';
-
-.habio-chat-widget {
-  display: flex;
-  flex-direction: column;
-  height: 400px;
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.habio-chat__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.habio-chat__messages {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  background: #f8f9fa;
-}
-
-.habio-message {
-  margin-bottom: 12px;
-  display: flex;
-  flex-direction: column;
-}
-
-.habio-message--user {
-  align-items: flex-end;
-}
-
-.habio-message--admin {
-  align-items: flex-start;
-}
-
-.habio-message--system {
-  align-items: center;
-}
-
-.habio-message__content {
-  max-width: 80%;
-  padding: 8px 12px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.habio-message--user .habio-message__content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.habio-message--admin .habio-message__content {
-  background: white;
-  color: #333;
-  border: 1px solid #e1e5e9;
-  border-bottom-left-radius: 4px;
-}
-
-.habio-message--system .habio-message__content {
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 12px;
-  font-style: italic;
-  text-align: center;
-}
-
-.habio-message__time {
-  font-size: 11px;
-  color: #666;
-  margin-top: 4px;
-}
-
-.habio-chat__input {
-  padding: 16px;
-  background: white;
-  border-top: 1px solid #e1e5e9;
-}
-
-.habio-chat__input form {
-  display: flex;
-  gap: 8px;
-}
-
-.habio-chat__input-field {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid #e1e5e9;
-  border-radius: 20px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.habio-chat__input-field:focus {
-  border-color: #667eea;
-}
-
-.habio-chat__send {
-  width: 40px;
-  height: 40px;
-  border: none;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 16px;
-  transition: transform 0.2s;
-}
-
-.habio-chat__send:hover:not(:disabled) {
-  transform: scale(1.05);
-}
-
-.habio-chat__send:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+@import '~/assets/css/widget-chat.css';
 </style>

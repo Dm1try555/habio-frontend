@@ -7,6 +7,7 @@
 - **widget-panel.css** - Стили панели виджета (заголовок, контент)
 - **widget-channels.css** - Стили каналов связи (кнопки, иконки)
 - **widget-forms.css** - Стили форм (callback форма, инпуты)
+- **widget-chat.css** - Стили чат-виджета (сообщения, ввод)
 
 ### Demo Page Styles
 - **demo-page.css** - Базовые стили демо страницы
