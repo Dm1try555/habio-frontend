@@ -42,30 +42,31 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
+import { useForm } from '~/composables/useForm'
 
-const props = defineProps<{
-  projectId: string
-  apiBase: string
-}>()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  },
+  apiBase: {
+    type: String,
+    required: true
+  }
+})
 
-const emit = defineEmits<{
-  close: []
-  success: [data: any]
-}>()
+const emit = defineEmits(['close', 'success'])
 
 const { trackEvent, getClientId } = useWidgetAnalytics()
 
-const form = ref({
+const { form, loading, error, withLoading } = useForm({
   name: '',
   email: '',
   message: ''
 })
 
-const loading = ref(false)
-
 const handleSubmit = async () => {
-  loading.value = true
-  try {
+  await withLoading(async () => {
     const response = await fetch(`${props.apiBase}/widget/${props.projectId}/create_lead/`, {
       method: 'POST',
       headers: {
@@ -96,12 +97,7 @@ const handleSubmit = async () => {
     } else {
       throw new Error('Failed to submit chat message')
     }
-  } catch (error) {
-    console.error('Failed to submit chat:', error)
-    alert('Ошибка при отправке сообщения. Попробуйте еще раз.')
-  } finally {
-    loading.value = false
-  }
+  })
 }
 </script>
 

@@ -44,14 +44,18 @@ interface ChatMessage {
   created_at: string
 }
 
-const props = defineProps<{
-  projectId: string
-  apiBase: string
-}>()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  },
+  apiBase: {
+    type: String,
+    required: true
+  }
+})
 
-const emit = defineEmits<{
-  close: []
-}>()
+const emit = defineEmits(['close'])
 
 const { trackEvent, getClientId } = useWidgetAnalytics()
 

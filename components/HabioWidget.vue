@@ -56,10 +56,16 @@ import HabioCallbackForm from '~/components/HabioCallbackForm.vue'
 import HabioChatWidget from '~/components/HabioChatWidget.vue'
 import HabioLeadForm from '~/components/HabioLeadForm.vue'
 
-const props = defineProps<{
-  projectId: string
-  apiBase?: string
-}>()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  },
+  apiBase: {
+    type: String,
+    default: 'http://127.0.0.1:8000/api'
+  }
+})
 
 const apiBase = props.apiBase || 'http://127.0.0.1:8000/api'
 

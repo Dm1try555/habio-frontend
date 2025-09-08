@@ -47,16 +47,26 @@
 import type { Channel } from '~/composables/useWidgetConfig'
 import { useChannelIcons } from '~/composables/useChannelIcons'
 
-defineProps<{
-  isOnline: boolean
-  nextAvailable: string
-  topChannels: Channel[]
-  otherChannels: Channel[]
-}>()
+defineProps({
+  isOnline: {
+    type: Boolean,
+    required: true
+  },
+  nextAvailable: {
+    type: String,
+    required: true
+  },
+  topChannels: {
+    type: Array,
+    required: true
+  },
+  otherChannels: {
+    type: Array,
+    required: true
+  }
+})
 
-defineEmits<{
-  'channel-click': [channel: Channel]
-}>()
+defineEmits(['channel-click'])
 
 const { getChannelIcon } = useChannelIcons()
 </script>

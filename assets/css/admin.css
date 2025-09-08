@@ -1,0 +1,6 @@
+/* Admin Panel - All Styles */
+@import './admin-base.css';
+@import './admin-tables.css';
+@import './admin-buttons.css';
+@import './admin-modals.css';
+@import './admin-chat.css';

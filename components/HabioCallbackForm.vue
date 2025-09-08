@@ -39,30 +39,31 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
+import { useForm } from '~/composables/useForm'
 
-const props = defineProps<{
-  projectId: string
-  apiBase: string
-}>()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  },
+  apiBase: {
+    type: String,
+    required: true
+  }
+})
 
-const emit = defineEmits<{
-  close: []
-  success: [data: any]
-}>()
+const emit = defineEmits(['close', 'success'])
 
 const { trackEvent, getClientId } = useWidgetAnalytics()
 
-const form = ref({
+const { form, loading, error, withLoading } = useForm({
   phone: '',
   preferred_time: '',
   message: ''
 })
 
-const loading = ref(false)
-
 const handleSubmit = async () => {
-  loading.value = true
-  try {
+  await withLoading(async () => {
     // Create lead for callback request
     const response = await fetch(`${props.apiBase}/widget/${props.projectId}/create_lead/`, {
       method: 'POST',
@@ -96,12 +97,7 @@ const handleSubmit = async () => {
       console.error('API error:', errorData)
       throw new Error('Failed to submit callback request')
     }
-  } catch (error) {
-    console.error('Failed to submit callback:', error)
-    alert('Ошибка при отправке заявки. Попробуйте еще раз.')
-  } finally {
-    loading.value = false
-  }
+  })
 }
 </script>
 

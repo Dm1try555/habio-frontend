@@ -51,66 +51,67 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
+import { useForm } from '~/composables/useForm'
 
-const props = defineProps<{
-  projectId: string
-  apiBase: string
-}>()
+const props = defineProps({
+  projectId: {
+    type: String,
+    required: true
+  },
+  apiBase: {
+    type: String,
+    required: true
+  }
+})
 
-const emit = defineEmits<{
-  close: []
-  success: [data: any]
-}>()
+const emit = defineEmits(['close', 'success'])
 
 const { trackEvent, getClientId } = useWidgetAnalytics()
 
-const form = ref({
+const { form, loading, error, withLoading } = useForm({
   name: '',
   email: '',
   phone: '',
   message: ''
 })
 
-const loading = ref(false)
-
 const handleSubmit = async () => {
-  loading.value = true
   try {
-    const response = await fetch(`${props.apiBase}/widget/${props.projectId}/create_lead/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        channel: 6, // Оставить заявку
-        contact: `${form.value.name} <${form.value.email}>`,
-        message: `Телефон: ${form.value.phone}\n\n${form.value.message}`,
-        page_url: window.location.href,
-        client_id: getClientId(),
-        device_type: 'desktop',
-        language: navigator.language
+    await withLoading(async () => {
+      const response = await fetch(`${props.apiBase}/widget/${props.projectId}/create_lead/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          channel: 6, // Оставить заявку
+          contact: `${form.value.name} <${form.value.email}>`,
+          message: `Телефон: ${form.value.phone}\n\n${form.value.message}`,
+          page_url: window.location.href,
+          client_id: getClientId(),
+          device_type: 'desktop',
+          language: navigator.language
+        })
       })
-    })
-    
-    if (response.ok) {
-      const result = await response.json()
-      alert('Заявка отправлена!')
-      form.value = { name: '', email: '', phone: '', message: '' }
-      emit('success', result)
       
-      trackEvent('lead_created', {
-        lead_id: result.id,
-        contact: form.value.name,
-        type: 'form'
-      })
-    } else {
-      throw new Error('Failed to submit lead')
-    }
+      if (response.ok) {
+        const result = await response.json()
+        alert('Заявка отправлена!')
+        form.value = { name: '', email: '', phone: '', message: '' }
+        emit('success', result)
+        
+        trackEvent('lead_created', {
+          lead_id: result.id,
+          contact: form.value.name,
+          type: 'form'
+        })
+      } else {
+        throw new Error('Failed to submit lead')
+      }
+    })
   } catch (error) {
     console.error('Failed to submit lead:', error)
     alert('Ошибка при отправке заявки. Попробуйте еще раз.')
-  } finally {
-    loading.value = false
   }
 }
 </script>

@@ -1,10 +1,13 @@
 /* HABIO-CHAT - Main CSS File */
 
+/* Common Styles */
+@import './buttons.css';
+@import './forms.css';
+
 /* Widget Styles */
 @import './widget-base.css';
 @import './widget-panel.css';
 @import './widget-channels.css';
-@import './widget-forms.css';
 @import './widget-chat.css';
 
 /* Demo Page Styles */
@@ -13,10 +16,13 @@
 @import './demo-api.css';
 
 /* Admin Panel Styles */
-@import './admin-base.css';
-@import './admin-tables.css';
-@import './admin-buttons.css';
-@import './admin-modals.css';
+@import './admin.css';
+
+/* Login Styles */
+@import './login.css';
+
+/* Profile Styles */
+@import './profile.css';
 
 /* Global Styles */
 * {

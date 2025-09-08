@@ -14,13 +14,14 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  isOpen: boolean
-}>()
+defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true
+  }
+})
 
-defineEmits<{
-  toggle: []
-}>()
+defineEmits(['toggle'])
 </script>
 
 <style scoped>
