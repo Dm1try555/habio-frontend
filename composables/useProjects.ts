@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface Project {
   id: number
@@ -13,7 +12,7 @@ export interface Project {
 }
 
 export const useProjects = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const projects = ref<Project[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -22,7 +21,8 @@ export const useProjects = () => {
     try {
       loading.value = true
       error.value = null
-      projects.value = await api.get<Project[]>('/projects/')
+      const response = await $api.get('/projects/')
+      projects.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load projects'
       console.error('Failed to load projects:', err)
@@ -35,7 +35,8 @@ export const useProjects = () => {
     try {
       loading.value = true
       error.value = null
-      const project = await api.post<Project>('/projects/', data)
+      const response = await $api.post('/projects/', data)
+      const project = response.data
       projects.value.push(project)
       return project
     } catch (err: any) {
@@ -50,7 +51,8 @@ export const useProjects = () => {
     try {
       loading.value = true
       error.value = null
-      const project = await api.put<Project>(`/projects/${id}/`, data)
+      const response = await $api.put(`/projects/${id}/`, data)
+      const project = response.data
       const index = projects.value.findIndex(p => p.id === id)
       if (index !== -1) {
         projects.value[index] = project
@@ -68,7 +70,7 @@ export const useProjects = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/projects/${id}/`)
+      await $api.delete(`/projects/${id}/`)
       projects.value = projects.value.filter(p => p.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete project'

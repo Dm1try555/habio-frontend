@@ -1,5 +1,4 @@
 import { ref, computed, onMounted } from 'vue'
-import { useApi } from './useApi'
 
 interface User {
   id: number
@@ -18,16 +17,19 @@ interface LoginData {
 }
 
 export const useAuth = () => {
-  const { api, post, get } = useApi()
+  const { $api } = useNuxtApp()
   
   const user = ref<User | null>(null)
-  const token = ref<string | null>(null)
-  const refreshToken = ref<string | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  
+  const accessTokenCookie = useCookie('access_token')
+  const refreshTokenCookie = useCookie('refresh_token')
+  const userRoleCookie = useCookie('user_role')
+  const userEmailCookie = useCookie('user_email')
 
   // Computed properties
-  const isAuthenticated = computed(() => !!user.value && !!token.value)
+  const isAuthenticated = computed(() => !!user.value && !!accessTokenCookie.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
   const isMarketing = computed(() => user.value?.role === 'marketing')
   const isViewer = computed(() => user.value?.role === 'viewer')
@@ -37,31 +39,17 @@ export const useAuth = () => {
     return `/admin/${role}`
   }
 
-  // Initialize tokens on client side
+  // Initialize user from cookies
   onMounted(() => {
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('access_token')
-      const storedRefreshToken = localStorage.getItem('refresh_token')
-      const userRole = localStorage.getItem('user_role')
-      const userEmail = localStorage.getItem('user_email')
-      
-      if (storedToken && storedRefreshToken && userEmail) {
-        token.value = storedToken
-        refreshToken.value = storedRefreshToken
-        api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`
-        // Create a simple user object from stored data
-        user.value = {
-          id: 1,
-          username: userEmail,
-          email: userEmail,
-          role: (userRole as 'admin' | 'marketing' | 'viewer') || 'viewer',
-          is_active: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }
-      } else {
-        // Clear any existing token if no valid data
-        api.defaults.headers.common['Authorization'] = ''
+    if (accessTokenCookie.value && userEmailCookie.value) {
+      user.value = {
+        id: 1,
+        username: userEmailCookie.value,
+        email: userEmailCookie.value,
+        role: (userRoleCookie.value as 'admin' | 'marketing' | 'viewer') || 'viewer',
+        is_active: true,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
       }
     }
   })
@@ -71,28 +59,23 @@ export const useAuth = () => {
       isLoading.value = true
       error.value = null
 
-      // Clear any existing token before login
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('user_email')
-        localStorage.removeItem('user_role')
-      }
-      api.defaults.headers.common['Authorization'] = ''
+      // Clear any existing tokens
+      accessTokenCookie.value = null
+      refreshTokenCookie.value = null
+      userEmailCookie.value = null
+      userRoleCookie.value = null
 
       // Real API authentication
-      console.log('Attempting login with:', data)
-      const response = await post('auth/login/', {
+      const response = await $api.post('auth/login/', {
         username: data.username,
         password: data.password
       })
-      console.log('Login response:', response)
 
-      if (!response) {
+      if (!response.data) {
         throw new Error('Invalid response from server')
       }
 
-      const { access, refresh, user: userData } = response as { access: string, refresh: string, user: User }
+      const { access, refresh, user: userData } = response.data
 
       // Update state
       user.value = {
@@ -104,26 +87,18 @@ export const useAuth = () => {
         created_at: userData.created_at,
         updated_at: userData.created_at
       }
-      token.value = access
-      refreshToken.value = refresh
 
-      // Save to localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('access_token', access)
-        localStorage.setItem('refresh_token', refresh)
-        localStorage.setItem('user_email', userData.email)
-        localStorage.setItem('user_role', userData.role)
-      }
-      
-      // Set token in API headers
-      api.defaults.headers.common['Authorization'] = `Bearer ${access}`
+      // Save to cookies
+      accessTokenCookie.value = access
+      refreshTokenCookie.value = refresh
+      userEmailCookie.value = userData.email
+      userRoleCookie.value = userData.role
 
       // Get redirect URL based on role
       const redirectUrl = getRedirectUrl(userData.role)
 
       return { user: user.value, access, refresh, redirectUrl }
     } catch (err: any) {
-      console.error('Login error:', err)
       error.value = err.response?.data?.error || err.message || 'Login failed'
       throw err
     } finally {
@@ -134,23 +109,16 @@ export const useAuth = () => {
   const logout = async () => {
     // Clear state
     user.value = null
-    token.value = null
-    refreshToken.value = null
     
-    // Clear localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('user_email')
-      localStorage.removeItem('user_role')
-    }
-    
-    // Clear API headers
-    delete api.defaults.headers.common['Authorization']
+    // Clear cookies
+    accessTokenCookie.value = null
+    refreshTokenCookie.value = null
+    userEmailCookie.value = null
+    userRoleCookie.value = null
   }
 
   const checkAuth = async () => {
-    if (token.value && user.value) {
+    if (accessTokenCookie.value && user.value) {
       return user.value
     }
     return null
@@ -158,8 +126,6 @@ export const useAuth = () => {
 
   return {
     user,
-    token,
-    refreshToken,
     isLoading,
     error,
     isAuthenticated,

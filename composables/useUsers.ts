@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 import { getRoleLabel } from '~/utils/roleUtils'
 
 export interface User {
@@ -15,7 +14,7 @@ export interface User {
 }
 
 export const useUsers = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const users = ref<User[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -24,7 +23,8 @@ export const useUsers = () => {
     try {
       loading.value = true
       error.value = null
-      users.value = await api.get<User[]>('/users/')
+      const response = await $api.get('/users/')
+      users.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load users'
       console.error('Failed to load users:', err)
@@ -37,7 +37,8 @@ export const useUsers = () => {
     try {
       loading.value = true
       error.value = null
-      const user = await api.post<User>('/users/', data)
+      const response = await $api.post('/users/', data)
+      const user = response.data
       users.value.push(user)
       return user
     } catch (err: any) {
@@ -52,7 +53,8 @@ export const useUsers = () => {
     try {
       loading.value = true
       error.value = null
-      const user = await api.put<User>(`/users/${id}/`, data)
+      const response = await $api.put(`/users/${id}/`, data)
+      const user = response.data
       const index = users.value.findIndex(u => u.id === id)
       if (index !== -1) {
         users.value[index] = user
@@ -70,7 +72,7 @@ export const useUsers = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/users/${id}/`)
+      await $api.delete(`/users/${id}/`)
       users.value = users.value.filter(u => u.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete user'

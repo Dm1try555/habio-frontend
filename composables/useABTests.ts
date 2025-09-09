@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface ABTest {
   id: number
@@ -24,7 +23,7 @@ export interface ABTestVariant {
 }
 
 export const useABTests = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const abTests = ref<ABTest[]>([])
   const variants = ref<ABTestVariant[]>([])
   const loading = ref(false)
@@ -34,7 +33,8 @@ export const useABTests = () => {
     try {
       loading.value = true
       error.value = null
-      abTests.value = await api.get<ABTest[]>('/ab-tests/')
+      const response = await $api.get('/ab-tests/')
+      abTests.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load AB tests'
       console.error('Failed to load AB tests:', err)
@@ -47,7 +47,8 @@ export const useABTests = () => {
     try {
       loading.value = true
       error.value = null
-      variants.value = await api.get<ABTestVariant[]>(`/ab-tests/${testId}/variants/`)
+      const response = await $api.get(`/ab-tests/${testId}/variants/`)
+      variants.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load variants'
       console.error('Failed to load variants:', err)
@@ -60,7 +61,8 @@ export const useABTests = () => {
     try {
       loading.value = true
       error.value = null
-      const test = await api.post<ABTest>('/ab-tests/', data)
+      const response = await $api.post('/ab-tests/', data)
+      const test = response.data
       abTests.value.push(test)
       return test
     } catch (err: any) {
@@ -75,7 +77,8 @@ export const useABTests = () => {
     try {
       loading.value = true
       error.value = null
-      const test = await api.put<ABTest>(`/ab-tests/${id}/`, data)
+      const response = await $api.put(`/ab-tests/${id}/`, data)
+      const test = response.data
       const index = abTests.value.findIndex(t => t.id === id)
       if (index !== -1) {
         abTests.value[index] = test
@@ -93,7 +96,7 @@ export const useABTests = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/ab-tests/${id}/`)
+      await $api.delete(`/ab-tests/${id}/`)
       abTests.value = abTests.value.filter(t => t.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete AB test'

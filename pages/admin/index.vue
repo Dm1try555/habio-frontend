@@ -1,8 +1,10 @@
+<!-- pages/index.vue -->
 <template>
-  <div />
+  <div /> <!-- можно оставить пустым -->
 </template>
 
-<script setup>
-definePageMeta({ redirect: '/admin/login' })
+<script setup lang="ts">
+definePageMeta({
+  redirect: '/admin/login' // или '/admin/login', если файл в папке admin
+})
 </script>
-

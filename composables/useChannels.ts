@@ -1,9 +1,8 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 import type { Channel } from './useWidgetConfig'
 
 export const useChannels = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const channels = ref<Channel[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -12,7 +11,8 @@ export const useChannels = () => {
     try {
       loading.value = true
       error.value = null
-      channels.value = await api.get<Channel[]>('/channels/')
+      const response = await $api.get('/channels/')
+      channels.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load channels'
       console.error('Failed to load channels:', err)
@@ -25,7 +25,8 @@ export const useChannels = () => {
     try {
       loading.value = true
       error.value = null
-      const channel = await api.post<Channel>('/channels/', data)
+      const response = await $api.post('/channels/', data)
+      const channel = response.data
       channels.value.push(channel)
       return channel
     } catch (err: any) {
@@ -40,7 +41,8 @@ export const useChannels = () => {
     try {
       loading.value = true
       error.value = null
-      const channel = await api.put<Channel>(`/channels/${id}/`, data)
+      const response = await $api.put(`/channels/${id}/`, data)
+      const channel = response.data
       const index = channels.value.findIndex(c => c.id === id)
       if (index !== -1) {
         channels.value[index] = channel
@@ -58,7 +60,7 @@ export const useChannels = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/channels/${id}/`)
+      await $api.delete(`/channels/${id}/`)
       channels.value = channels.value.filter(c => c.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete channel'

@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface Lead {
   id: number
@@ -12,7 +11,7 @@ export interface Lead {
 }
 
 export const useLeads = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const leads = ref<Lead[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -21,7 +20,8 @@ export const useLeads = () => {
     try {
       loading.value = true
       error.value = null
-      leads.value = await api.get<Lead[]>('/leads/')
+      const response = await $api.get('/leads/')
+      leads.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load leads'
       console.error('Failed to load leads:', err)
@@ -34,7 +34,8 @@ export const useLeads = () => {
     try {
       loading.value = true
       error.value = null
-      const lead = await api.patch<Lead>(`/leads/${id}/`, { status })
+      const response = await $api.patch(`/leads/${id}/`, { status })
+      const lead = response.data
       const index = leads.value.findIndex(l => l.id === id)
       if (index !== -1) {
         leads.value[index] = lead
@@ -52,7 +53,7 @@ export const useLeads = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/leads/${id}/`)
+      await $api.delete(`/leads/${id}/`)
       leads.value = leads.value.filter(l => l.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete lead'

@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface WebhookSettings {
 url: string
@@ -19,7 +18,7 @@ export interface SecuritySettings {
 }
 
 export const useSettings = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -52,7 +51,8 @@ export const useSettings = () => {
       error.value = null
       
       // Load webhook settings from project
-      const project = await api.get('/projects/1/')
+      const response = await $api.get('/projects/1/')
+      const project = response.data
       webhookSettings.value = {
         url: project.data.webhook_url || '',
         secret: project.data.webhook_secret || '',
@@ -83,7 +83,7 @@ export const useSettings = () => {
       loading.value = true
       error.value = null
       
-      await api.patch('/projects/1/', {
+      await $api.patch('/projects/1/', {
         webhook_url: webhookSettings.value.url,
         webhook_secret: webhookSettings.value.secret
       })

@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface Schedule {
   id: number
@@ -13,7 +12,7 @@ export interface Schedule {
 }
 
 export const useSchedules = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const schedules = ref<Schedule[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -22,7 +21,8 @@ export const useSchedules = () => {
     try {
       loading.value = true
       error.value = null
-      schedules.value = await api.get<Schedule[]>('/schedules/')
+      const response = await $api.get('/schedules/')
+      schedules.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load schedules'
       console.error('Failed to load schedules:', err)
@@ -35,7 +35,8 @@ export const useSchedules = () => {
     try {
       loading.value = true
       error.value = null
-      const schedule = await api.post<Schedule>('/schedules/', data)
+      const response = await $api.post('/schedules/', data)
+      const schedule = response.data
       schedules.value.push(schedule)
       return schedule
     } catch (err: any) {
@@ -50,7 +51,8 @@ export const useSchedules = () => {
     try {
       loading.value = true
       error.value = null
-      const schedule = await api.put<Schedule>(`/schedules/${id}/`, data)
+      const response = await $api.put(`/schedules/${id}/`, data)
+      const schedule = response.data
       const index = schedules.value.findIndex(s => s.id === id)
       if (index !== -1) {
         schedules.value[index] = schedule
@@ -68,7 +70,7 @@ export const useSchedules = () => {
     try {
       loading.value = true
       error.value = null
-      await api.delete(`/schedules/${id}/`)
+      await $api.delete(`/schedules/${id}/`)
       schedules.value = schedules.value.filter(s => s.id !== id)
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to delete schedule'

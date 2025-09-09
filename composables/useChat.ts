@@ -1,5 +1,4 @@
 import { ref } from 'vue'
-import { useApi } from './useApi'
 
 export interface ChatSession {
   id: number
@@ -19,7 +18,7 @@ export interface ChatMessage {
 }
 
 export const useChat = () => {
-  const { api } = useApi()
+  const { $api } = useNuxtApp()
   const sessions = ref<ChatSession[]>([])
   const messages = ref<ChatMessage[]>([])
   const selectedSession = ref<ChatSession | null>(null)
@@ -30,7 +29,8 @@ export const useChat = () => {
     try {
       loading.value = true
       error.value = null
-      sessions.value = (await api.get<ChatSession[]>('/chat-sessions/')).data
+      const response = await $api.get('/chat-sessions/')
+      sessions.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load chat sessions'
       console.error('Failed to load chat sessions:', err)
@@ -44,7 +44,8 @@ export const useChat = () => {
     try {
       loading.value = true
       error.value = null
-      messages.value = (await api.get<ChatMessage[]>(`/chat-sessions/${sessionId}/messages/`)).data
+      const response = await $api.get(`/chat-sessions/${sessionId}/messages/`)
+      messages.value = response.data
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Failed to load messages'
       console.error('Failed to load messages:', err)
@@ -57,11 +58,12 @@ export const useChat = () => {
     try {
       loading.value = true
       error.value = null
-      const message = (await api.post<ChatMessage>('/chat-messages/', {
+      const response = await $api.post('/chat-messages/', {
         session: sessionId,
         message_type: messageType,
         content
-      })).data
+      })
+      const message = response.data
       messages.value.push(message as ChatMessage)
       return message
     } catch (err: any) {
