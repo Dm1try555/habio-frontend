@@ -1,0 +1,12 @@
+/* Admin-specific CSS */
+
+/* Import shared styles first */
+@import '../shared/index.css';
+
+/* Admin-specific styles */
+@import './admin.css';
+@import './admin-base.css';
+@import './admin-buttons.css';
+@import './admin-modals.css';
+@import './admin-tables.css';
+@import './admin-chat.css';

@@ -1,0 +1,11 @@
+/* Widget-specific CSS */
+
+/* Import shared styles first */
+@import '../shared/index.css';
+
+/* Widget-specific styles */
+@import './widget-base.css';
+@import './widget-panel.css';
+@import './widget-channels.css';
+@import './widget-forms.css';
+@import './widget-chat.css';
