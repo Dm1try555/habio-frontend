@@ -46,10 +46,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import type { Channel } from '~/composables/useWidgetConfig'
-import { useWidgetConfig } from '~/composables/useWidgetConfig'
-import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
-import { useChannelMemory } from '~/composables/useChannelMemory'
+import type { Channel } from '~/composables/shared/useWidgetConfig'
+import { useWidgetConfig } from '~/composables/shared/useWidgetConfig'
+import { useWidgetAnalytics } from '~/composables/shared/useWidgetAnalytics'
+import { useChannelMemory } from '~/composables/shared/useChannelMemory'
 import HabioFab from '~/components/HabioFab.vue'
 import HabioPanel from '~/components/HabioPanel.vue'
 import HabioCallbackForm from '~/components/HabioCallbackForm.vue'
@@ -153,8 +153,8 @@ const handleChannelClick = (channel: Channel) => {
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-base.css';
-@import '~/assets/css/widget-panel.css';
-@import '~/assets/css/widget-channels.css';
-@import '~/assets/css/widget-forms.css';
+@import '~/assets/css/widget/widget-base.css';
+@import '~/assets/css/widget/widget-panel.css';
+@import '~/assets/css/widget/widget-channels.css';
+@import '~/assets/css/widget/widget-forms.css';
 </style>

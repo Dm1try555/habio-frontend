@@ -25,5 +25,5 @@ defineEmits(['toggle'])
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-base.css';
+@import '~/assets/css/widget/widget-base.css';
 </style>

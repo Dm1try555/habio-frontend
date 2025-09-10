@@ -1,5 +1,5 @@
 /* Admin Panel - Button Styles */
-@import './buttons.css';
+@import '../shared/buttons.css';
 
 /* Admin specific button overrides */
 
