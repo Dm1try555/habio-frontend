@@ -9,6 +9,7 @@ export interface Channel {
   show_in_top: boolean
   icon?: string
   description?: string
+  phone_number?: string
 }
 
 export interface WidgetConfig {

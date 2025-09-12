@@ -84,6 +84,77 @@ export const useSchedules = () => {
     return schedules.value.find(s => s.id === id)
   }
 
+  // Additional functions for admin interface
+  const showScheduleForm = ref(false)
+  const editingSchedule = ref<Schedule | null>(null)
+  const scheduleForm = ref({
+    project: '',
+    day: 'monday',
+    start_time: '09:00',
+    end_time: '18:00',
+    is_working_day: true
+  })
+
+  const editSchedule = (schedule: Schedule) => {
+    editingSchedule.value = schedule
+    scheduleForm.value = {
+      project: schedule.project,
+      day: schedule.day,
+      start_time: schedule.start_time,
+      end_time: schedule.end_time,
+      is_working_day: schedule.is_working_day
+    }
+    showScheduleForm.value = true
+  }
+
+  const saveSchedule = async () => {
+    try {
+      if (editingSchedule.value) {
+        await updateSchedule(editingSchedule.value.id, scheduleForm.value)
+      } else {
+        await createSchedule(scheduleForm.value)
+      }
+      closeScheduleForm()
+    } catch (err) {
+      console.error('Failed to save schedule:', err)
+    }
+  }
+
+  const handleDeleteSchedule = async (id: number) => {
+    if (confirm('Вы уверены, что хотите удалить это расписание?')) {
+      try {
+        await deleteSchedule(id)
+      } catch (err) {
+        console.error('Failed to delete schedule:', err)
+      }
+    }
+  }
+
+  const closeScheduleForm = () => {
+    showScheduleForm.value = false
+    editingSchedule.value = null
+    scheduleForm.value = {
+      project: '',
+      day: 'monday',
+      start_time: '09:00',
+      end_time: '18:00',
+      is_working_day: true
+    }
+  }
+
+  const getDayName = (day: string) => {
+    const days = {
+      monday: 'Понедельник',
+      tuesday: 'Вторник',
+      wednesday: 'Среда',
+      thursday: 'Четверг',
+      friday: 'Пятница',
+      saturday: 'Суббота',
+      sunday: 'Воскресенье'
+    }
+    return days[day as keyof typeof days] || day
+  }
+
   return {
     schedules,
     loading,
@@ -92,6 +163,14 @@ export const useSchedules = () => {
     createSchedule,
     updateSchedule,
     deleteSchedule,
-    getSchedule
+    getSchedule,
+    showScheduleForm,
+    editingSchedule,
+    scheduleForm,
+    editSchedule,
+    saveSchedule,
+    handleDeleteSchedule,
+    closeScheduleForm,
+    getDayName
   }
 }

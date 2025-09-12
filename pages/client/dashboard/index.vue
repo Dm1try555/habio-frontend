@@ -139,24 +139,31 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useClientAuth } from '~/composables/client/useClientAuth'
+import { mockChannelAnalytics, mockActivities, getTotals } from '~/utils/mockAnalytics'
+import { useSubscription } from '~/composables/useSubscription'
 
 const { user, isAuthenticated } = useClientAuth()
 const { currentPlan } = useSubscription()
-const { 
-  channelAnalytics, 
-  getTotalClicks, 
-  getTotalConversions, 
-  getOverallConversionRate,
-  loadOverviewMetrics,
-  setDateRange
-} = useClientAnalytics()
+
+// Mock data for now
+const channelAnalytics = ref(mockChannelAnalytics)
+
+const getTotalClicks = computed(() => getTotals(channelAnalytics.value).totalClicks)
+const getTotalConversions = computed(() => getTotals(channelAnalytics.value).totalConversions)
+const getOverallConversionRate = computed(() => getTotals(channelAnalytics.value).conversionRate)
+
+const loadOverviewMetrics = async () => {
+  // Mock function for now
+  console.log('Loading overview metrics...')
+}
+
+const setDateRange = (start: string, end: string) => {
+  console.log('Setting date range:', start, end)
+}
 
 const selectedPeriod = ref('30')
-const recentActivities = ref([
-  { id: 1, type: 'click', channel: 'Telegram', time: '2 минуты назад' },
-  { id: 2, type: 'lead', message: 'Новая заявка от клиента', time: '15 минут назад' },
-  { id: 3, type: 'conversion', channel: 'WhatsApp', time: '1 час назад' }
-])
+const recentActivities = ref(mockActivities)
 
 const subscriptionType = computed(() => currentPlan.value?.type || 'free')
 const totalClicks = computed(() => getTotalClicks.value)
@@ -173,8 +180,8 @@ const refreshData = async () => {
   const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000)
   
   setDateRange(
-    startDate.toISOString().split('T')[0],
-    endDate.toISOString().split('T')[0]
+    startDate.toISOString().split('T')[0] || '2025-01-01',
+    endDate.toISOString().split('T')[0] || '2025-01-31'
   )
   
   await loadOverviewMetrics()

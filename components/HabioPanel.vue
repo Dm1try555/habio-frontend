@@ -44,8 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import type { Channel } from '~/composables/useWidgetConfig'
-import { useChannelIcons } from '~/composables/useChannelIcons'
+import type { Channel } from '~/composables/shared/useWidgetConfig'
+import { useChannelIcons } from '~/composables/shared/useChannelIcons'
 
 defineProps({
   isOnline: {
@@ -72,6 +72,5 @@ const { getChannelIcon } = useChannelIcons()
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-panel.css';
-@import '~/assets/css/widget-channels.css';
+/* Widget styles are now imported globally in nuxt.config.ts */
 </style>

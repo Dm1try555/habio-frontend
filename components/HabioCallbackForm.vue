@@ -38,8 +38,8 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
-import { useForm } from '~/composables/useForm'
+import { useWidgetAnalytics } from '~/composables/shared/useWidgetAnalytics'
+import { useForm } from '~/composables/shared/useForm'
 
 const props = defineProps({
   projectId: {
@@ -102,5 +102,5 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-forms.css';
+/* Widget styles are now imported globally in nuxt.config.ts */
 </style>

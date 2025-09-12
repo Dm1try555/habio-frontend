@@ -53,8 +53,8 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useLeadScripts } from '~/scripts/leads'
-import { useChatScripts } from '~/scripts/chat'
+import { useAdminLeads } from '~/composables/admin/useAdminLeads'
+import { useAdminChat } from '~/composables/admin/useAdminChat'
 
 const {
   leads,
@@ -64,9 +64,9 @@ const {
   getContactMessage,
   toggleLeadStatus,
   handleDeleteLead
-} = useLeadScripts()
+} = useAdminLeads()
 
-const { formatDate } = useChatScripts()
+const { formatDate } = useAdminChat()
 
 onMounted(async () => {
   try {

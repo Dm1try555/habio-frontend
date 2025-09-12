@@ -8,13 +8,25 @@
 
       <form @submit.prevent="handleRegister" class="auth-form">
         <div class="form-group">
-          <label for="name">Имя</label>
+          <label for="first_name">Имя</label>
           <input
-            id="name"
-            v-model="form.name"
+            id="first_name"
+            v-model="form.first_name"
             type="text"
             required
             placeholder="Ваше имя"
+            :disabled="isLoading"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="last_name">Фамилия</label>
+          <input
+            id="last_name"
+            v-model="form.last_name"
+            type="text"
+            required
+            placeholder="Ваша фамилия"
             :disabled="isLoading"
           />
         </div>
@@ -98,11 +110,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useClientAuth } from '~/composables/client/useClientAuth'
 
-const { register, isLoading, error } = useClientAuth()
+const { register, isLoading, error, isAuthenticated } = useClientAuth()
 
 const form = ref({
-  name: '',
+  first_name: '',
+  last_name: '',
   email: '',
   password: '',
   confirmPassword: '',
@@ -110,7 +124,8 @@ const form = ref({
 })
 
 const isFormValid = computed(() => {
-  return form.value.name && 
+  return form.value.first_name && 
+         form.value.last_name &&
          form.value.email && 
          form.value.password && 
          form.value.password === form.value.confirmPassword &&
@@ -122,195 +137,24 @@ const handleRegister = async () => {
 
   try {
     await register({
-      name: form.value.name,
+      first_name: form.value.first_name,
+      last_name: form.value.last_name,
       email: form.value.email,
       password: form.value.password
     })
+    // Redirect to client dashboard after successful registration
     await navigateTo('/client/dashboard')
   } catch (err) {
     // Error is handled by the composable
+    console.error('Registration error:', err)
   }
 }
 
 // Redirect if already authenticated
-const { isAuthenticated } = useClientAuth()
 if (isAuthenticated.value) {
   await navigateTo('/client/dashboard')
 }
 </script>
 
-<style scoped>
-.auth-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
-}
-
-.auth-container {
-  background: white;
-  border-radius: 12px;
-  padding: 40px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 450px;
-}
-
-.auth-header {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.auth-header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 8px;
-}
-
-.auth-header p {
-  color: #666;
-  font-size: 16px;
-}
-
-.auth-form {
-  margin-bottom: 30px;
-}
-
-.form-group {
-  margin-bottom: 20px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-  color: #333;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e1e5e9;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: border-color 0.2s;
-}
-
-.form-group input:focus {
-  outline: none;
-  border-color: #667eea;
-}
-
-.form-hint {
-  display: block;
-  margin-top: 4px;
-  color: #666;
-  font-size: 14px;
-}
-
-.checkbox-group {
-  margin-bottom: 24px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: auto;
-  margin: 0;
-}
-
-.checkbox-label a {
-  color: #667eea;
-  text-decoration: none;
-}
-
-.checkbox-label a:hover {
-  text-decoration: underline;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 12px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #5a6fd8;
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.error-message {
-  background: #fee;
-  color: #c53030;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 16px;
-  text-align: center;
-}
-
-.auth-footer {
-  text-align: center;
-  margin-bottom: 30px;
-}
-
-.auth-footer p {
-  margin: 8px 0;
-  color: #666;
-}
-
-.auth-footer a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.auth-footer a:hover {
-  text-decoration: underline;
-}
-
-.pricing-preview {
-  background: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-}
-
-.pricing-preview h3 {
-  margin: 0 0 16px 0;
-  color: #333;
-  font-size: 18px;
-}
-
-.pricing-preview ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.pricing-preview li {
-  padding: 4px 0;
-  color: #666;
-  font-size: 14px;
-}
-</style>
+<style src="~/assets/css/client/index.css"></style>
+<style scoped></style>

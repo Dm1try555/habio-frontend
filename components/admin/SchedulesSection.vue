@@ -86,8 +86,8 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useScheduleScripts } from '~/scripts/schedules'
-import { useProjectScripts } from '~/scripts/projects'
+import { useSchedules } from '~/composables/admin/useSchedules'
+import { useAdminProjects } from '~/composables/admin/useAdminProjects'
 
 const {
   schedules,
@@ -98,10 +98,11 @@ const {
   editSchedule,
   saveSchedule,
   handleDeleteSchedule,
-  closeScheduleForm
-} = useScheduleScripts()
+  closeScheduleForm,
+  loadSchedules
+} = useSchedules()
 
-const { projects } = useProjectScripts()
+const { projects } = useAdminProjects()
 
 onMounted(async () => {
   try {

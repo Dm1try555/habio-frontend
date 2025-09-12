@@ -101,8 +101,8 @@
 </template>
 
 <script setup>
-import { useChannelScripts } from '~/scripts/channels'
-import { useProjectScripts } from '~/scripts/projects'
+import { useAdminChannels } from '~/composables/admin/useAdminChannels'
+import { useAdminProjects } from '~/composables/admin/useAdminProjects'
 
 const {
   channels,
@@ -113,7 +113,7 @@ const {
   saveChannel,
   handleDeleteChannel,
   closeChannelForm
-} = useChannelScripts()
+} = useAdminChannels()
 
-const { projects } = useProjectScripts()
+const { projects } = useAdminProjects()
 </script>

@@ -73,7 +73,7 @@
 </template>
 
 <script setup>
-import { useSettingScripts } from '~/scripts/settings'
+import { useSettings } from '~/composables/admin/useSettings'
 
 const {
   webhookSettings,
@@ -83,5 +83,5 @@ const {
   handleSaveWebhookSettings,
   handleSaveLocaleSettings,
   handleSaveSecuritySettings
-} = useSettingScripts()
+} = useSettings()
 </script>

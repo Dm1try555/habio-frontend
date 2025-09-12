@@ -1,0 +1,7 @@
+/* Marketing-specific CSS */
+
+/* Import shared styles first */
+@import '../shared/index.css';
+
+/* Marketing-specific styles */
+@import './marketing.css';

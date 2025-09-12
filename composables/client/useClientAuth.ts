@@ -3,128 +3,121 @@ import { ref, computed } from 'vue'
 export interface ClientUser {
   id: number
   email: string
-  name: string
-  subscription: 'free' | 'premium'
-  subscription_expires_at?: string
-  created_at: string
-  projects_count: number
-  max_projects: number
-  max_languages: number
-  max_themes: number
-  custom_styles_enabled: boolean
-}
-
-export interface ClientLoginData {
-  email: string
-  password: string
-}
-
-export interface ClientRegisterData {
-  email: string
-  password: string
-  name: string
+  first_name: string
+  last_name: string
+  role: 'viewer'
+  is_active: boolean
 }
 
 export const useClientAuth = () => {
   const { $api } = useNuxtApp()
-  
   const user = ref<ClientUser | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
-  
-  const accessTokenCookie = useCookie('client_access_token')
-  const refreshTokenCookie = useCookie('client_refresh_token')
-  const userDataCookie = useCookie('client_user_data')
 
-  const isAuthenticated = computed(() => !!user.value && !!accessTokenCookie.value)
-  const isPremium = computed(() => user.value?.subscription === 'premium')
-  const canCreateProject = computed(() => 
-    user.value ? user.value.projects_count < user.value.max_projects : false
-  )
+  const isAuthenticated = computed(() => !!user.value)
 
-  const login = async (data: ClientLoginData) => {
+  const login = async (credentials: { email: string; password: string }) => {
     try {
       isLoading.value = true
       error.value = null
-
-      const response = await $api.post('client/auth/login/', data)
-
-      if (!response.data) {
-        throw new Error('Invalid response from server')
+      
+      const response = await $api.post('/auth/login/', credentials)
+      const { user: userData, token } = response.data
+      
+      // Store token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('client_token', token)
+        localStorage.setItem('client_user', JSON.stringify(userData))
       }
-
-      const { access, refresh, user: userData } = response.data
-
+      
       user.value = userData
-      accessTokenCookie.value = access
-      refreshTokenCookie.value = refresh
-      userDataCookie.value = JSON.stringify(userData)
-
-      return { user: user.value, access, refresh }
+      return userData
     } catch (err: any) {
-      error.value = err.response?.data?.error || err.message || 'Login failed'
+      error.value = err.response?.data?.detail || 'Ошибка входа'
       throw err
     } finally {
       isLoading.value = false
     }
   }
 
-  const register = async (data: ClientRegisterData) => {
+  const register = async (userData: { 
+    email: string; 
+    password: string; 
+    first_name: string; 
+    last_name: string 
+  }) => {
     try {
       isLoading.value = true
       error.value = null
-
-      const response = await $api.post('client/auth/register/', data)
-
-      if (!response.data) {
-        throw new Error('Invalid response from server')
+      
+      const response = await $api.post('/auth/register/', userData)
+      const { user: newUser, token } = response.data
+      
+      // Store token
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('client_token', token)
+        localStorage.setItem('client_user', JSON.stringify(newUser))
       }
-
-      const { access, refresh, user: userData } = response.data
-
-      user.value = userData
-      accessTokenCookie.value = access
-      refreshTokenCookie.value = refresh
-      userDataCookie.value = JSON.stringify(userData)
-
-      return { user: user.value, access, refresh }
+      
+      user.value = newUser
+      return newUser
     } catch (err: any) {
-      error.value = err.response?.data?.error || err.message || 'Registration failed'
+      error.value = err.response?.data?.detail || 'Ошибка регистрации'
       throw err
     } finally {
       isLoading.value = false
     }
   }
 
-  const logout = async () => {
+  const logout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('client_token')
+      localStorage.removeItem('client_user')
+    }
     user.value = null
-    accessTokenCookie.value = null
-    refreshTokenCookie.value = null
-    userDataCookie.value = null
   }
 
-  const checkAuth = async () => {
-    if (accessTokenCookie.value && userDataCookie.value) {
-      try {
-        user.value = JSON.parse(userDataCookie.value)
-        return user.value
-      } catch {
-        await logout()
+  const checkAuth = () => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('client_token')
+      const userData = localStorage.getItem('client_user')
+      
+      if (token && userData) {
+        try {
+          user.value = JSON.parse(userData)
+        } catch (e) {
+          logout()
+        }
       }
     }
-    return null
   }
 
-  const refreshUserData = async () => {
-    if (!accessTokenCookie.value) return
-
+  const updateProfile = async (data: Partial<ClientUser>) => {
     try {
-      const response = await $api.get('client/auth/me/')
-      user.value = response.data
-      userDataCookie.value = JSON.stringify(response.data)
-    } catch (err) {
-      console.error('Failed to refresh user data:', err)
+      isLoading.value = true
+      error.value = null
+      
+      const response = await $api.put('/auth/profile/', data)
+      const updatedUser = response.data
+      
+      user.value = updatedUser
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('client_user', JSON.stringify(updatedUser))
+      }
+      
+      return updatedUser
+    } catch (err: any) {
+      error.value = err.response?.data?.detail || 'Ошибка обновления профиля'
+      throw err
+    } finally {
+      isLoading.value = false
     }
+  }
+
+  // Initialize auth on mount
+  if (typeof window !== 'undefined') {
+    checkAuth()
   }
 
   return {
@@ -132,12 +125,10 @@ export const useClientAuth = () => {
     isLoading,
     error,
     isAuthenticated,
-    isPremium,
-    canCreateProject,
     login,
     register,
     logout,
     checkAuth,
-    refreshUserData
+    updateProfile
   }
 }

@@ -1,10 +1,16 @@
-<!-- pages/index.vue -->
 <template>
-  <div /> <!-- можно оставить пустым -->
+  <div />
+  
 </template>
 
-<script setup lang="ts">
-definePageMeta({
-  redirect: '/admin/login' // или '/admin/login', если файл в папке admin
+<script setup>
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+onMounted(() => {
+  router.replace('/admin/admin/dashboard')
 })
 </script>
+

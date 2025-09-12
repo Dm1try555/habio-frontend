@@ -119,7 +119,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import '~/assets/css/demo-page.css';
-@import '~/assets/css/demo-features.css';
-@import '~/assets/css/demo-api.css';
+@import '~/assets/css/shared/demo-page.css';
+@import '~/assets/css/shared/demo-features.css';
+@import '~/assets/css/shared/demo-api.css';
 </style>

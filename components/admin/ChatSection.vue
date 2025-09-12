@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { useChatScripts } from '~/scripts/chat'
+import { useChat } from '~/composables/admin/useChat'
 
 const {
   chatSessions,
@@ -70,5 +70,5 @@ const {
   sendAdminMessage,
   formatTime,
   formatDate
-} = useChatScripts()
+} = useChat()
 </script>

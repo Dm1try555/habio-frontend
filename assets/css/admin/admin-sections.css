@@ -1,0 +1,27 @@
+/* Admin Section Pages - common styles */
+
+.admin-section-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section-header {
+  margin-bottom: 2rem;
+}
+
+.back-link {
+  color: var(--admin-primary);
+  text-decoration: none;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.admin-section-page h1 {
+  color: var(--admin-primary);
+}
+

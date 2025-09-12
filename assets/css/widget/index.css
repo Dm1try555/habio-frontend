@@ -1,10 +1,9 @@
-/* Widget-specific CSS */
+/* Widget CSS Index - Import all widget styles */
 
-/* Import shared styles first */
-@import '../shared/index.css';
-
-/* Widget-specific styles */
+/* Base widget styles */
 @import './widget-base.css';
+
+/* Widget components */
 @import './widget-panel.css';
 @import './widget-channels.css';
 @import './widget-forms.css';

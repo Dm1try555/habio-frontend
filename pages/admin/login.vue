@@ -42,7 +42,6 @@
               <option value="">Выберите роль</option>
               <option value="admin">Администратор</option>
               <option value="marketing">Маркетинг</option>
-              <option value="viewer">Просмотр</option>
             </select>
           </div>
           
@@ -62,15 +61,15 @@
       </div>
       
       <div class="login-footer">
-        <p>&copy; 2024 HABIO-CHAT. Все права защищены.</p>
+        <p>&copy; 2025 HABIO-CHAT. Все права защищены.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useAuth } from '~/composables/useAuth'
-import { useForm } from '~/composables/useForm'
+import { useAuth } from '~/composables/admin/useAdminAuth'
+import { useForm } from '~/composables/shared/useForm'
 import { useRouter } from 'vue-router'
 
 const { login } = useAuth()
@@ -90,21 +89,26 @@ const handleLogin = async () => {
 
   await withLoading(async () => {
     const result = await login({ 
-      username: form.value.email, 
+      email: form.value.email, 
       password: form.value.password,
       role: form.value.role
     })
     
-    // Redirect based on user role
-    if (result.redirectUrl) {
-      await router.push(result.redirectUrl)
-    } else {
-      await router.push('/admin')
+    // Redirect based on selected role
+    const role = String(form.value.role)
+    if (role === 'admin') {
+      await router.push('/admin/admin/dashboard')
+      return
     }
+    if (role === 'marketing') {
+      await router.push('/admin/marketing/dashboard')
+      return
+    }
+    await router.push('/admin/login')
   })
 }
 </script>
 
 <style scoped>
-@import '~/assets/css/login.css';
+@import '~/assets/css/client/login.css';
 </style>

@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { useProjectScripts } from '~/scripts/projects'
+import { useAdminProjects } from '~/composables/admin/useAdminProjects'
 
 const {
   projects,
@@ -83,5 +83,5 @@ const {
   saveProject,
   handleDeleteProject,
   closeProjectForm
-} = useProjectScripts()
+} = useAdminProjects()
 </script>

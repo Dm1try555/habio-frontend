@@ -99,3 +99,17 @@
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
 }
+
+/* Admin theme overrides */
+body.admin-theme {
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-secondary: #7c3aed;
+}
+
+/* Client theme overrides */
+body.client-theme {
+  --color-primary: #10b981;
+  --color-primary-hover: #059669;
+  --color-secondary: #06b6d4;
+}

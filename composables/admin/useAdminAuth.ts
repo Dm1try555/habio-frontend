@@ -11,9 +11,9 @@ interface User {
 }
 
 interface LoginData {
-  username: string
+  email: string
   password: string
-  role?: string
+  role: 'admin' | 'marketing' | 'viewer'
 }
 
 export const useAuth = () => {
@@ -23,10 +23,10 @@ export const useAuth = () => {
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   
-  const accessTokenCookie = useCookie('access_token')
-  const refreshTokenCookie = useCookie('refresh_token')
-  const userRoleCookie = useCookie('user_role')
-  const userEmailCookie = useCookie('user_email')
+  const accessTokenCookie = useCookie('admin_access_token')
+  const refreshTokenCookie = useCookie('admin_refresh_token')
+  const userRoleCookie = useCookie('admin_user_role')
+  const userEmailCookie = useCookie('admin_user_email')
 
   // Computed properties
   const isAuthenticated = computed(() => !!user.value && !!accessTokenCookie.value)
@@ -66,9 +66,10 @@ export const useAuth = () => {
       userRoleCookie.value = null
 
       // Real API authentication
-      const response = await $api.post('auth/login/', {
-        username: data.username,
-        password: data.password
+      const response = await $api.post('admin/auth/login/', {
+        email: data.email,
+        password: data.password,
+        role: data.role,
       })
 
       if (!response.data) {
@@ -82,7 +83,7 @@ export const useAuth = () => {
         id: userData.id,
         username: userData.username,
         email: userData.email,
-        role: userData.role,
+        role: data.role, 
         is_active: userData.is_active,
         created_at: userData.created_at,
         updated_at: userData.created_at
@@ -92,10 +93,10 @@ export const useAuth = () => {
       accessTokenCookie.value = access
       refreshTokenCookie.value = refresh
       userEmailCookie.value = userData.email
-      userRoleCookie.value = userData.role
+      userRoleCookie.value = data.role
 
       // Get redirect URL based on role
-      const redirectUrl = getRedirectUrl(userData.role)
+      const redirectUrl = getRedirectUrl(data.role)
 
       return { user: user.value, access, refresh, redirectUrl }
     } catch (err: any) {
@@ -107,10 +108,12 @@ export const useAuth = () => {
   }
 
   const logout = async () => {
-    // Clear state
+    try {
+      if (refreshTokenCookie.value) {
+        await $api.post('auth/logout/', { refresh: refreshTokenCookie.value })
+      }
+    } catch (e) {}
     user.value = null
-    
-    // Clear cookies
     accessTokenCookie.value = null
     refreshTokenCookie.value = null
     userEmailCookie.value = null

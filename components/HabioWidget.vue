@@ -153,8 +153,5 @@ const handleChannelClick = (channel: Channel) => {
 </script>
 
 <style scoped>
-@import '~/assets/css/widget/widget-base.css';
-@import '~/assets/css/widget/widget-panel.css';
-@import '~/assets/css/widget/widget-channels.css';
-@import '~/assets/css/widget/widget-forms.css';
+/* Widget styles are now imported globally in nuxt.config.ts */
 </style>

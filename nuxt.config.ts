@@ -14,9 +14,28 @@ export default defineNuxtConfig({
       watch: {
         usePolling: true
       }
+    },
+    optimizeDeps: {
+      include: ['vue', 'vue-router']
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['vue', 'vue-router'],
+            utils: ['axios']
+          }
+        }
+      }
     }
   },
   css: [
     '~/assets/css/shared/index.css'
-  ]
+  ],
+  // Отключаем SSR для ускорения dev режима
+  ssr: true,
+  // Оптимизируем сборку
+  experimental: {
+    payloadExtraction: false
+  }
 })

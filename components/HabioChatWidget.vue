@@ -35,7 +35,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { useWidgetAnalytics } from '~/composables/useWidgetAnalytics'
+import { useWidgetAnalytics } from '~/composables/shared/useWidgetAnalytics'
 
 interface ChatMessage {
   id: number
@@ -179,5 +179,5 @@ const formatTime = (timestamp: string) => {
 </script>
 
 <style scoped>
-@import '~/assets/css/widget-chat.css';
+/* Widget styles are now imported globally in nuxt.config.ts */
 </style>

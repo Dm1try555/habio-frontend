@@ -1,7 +1,7 @@
 import { ref } from 'vue'
-import type { Channel } from './useWidgetConfig'
+import type { Channel } from '../shared/useWidgetConfig'
 
-export const useChannels = () => {
+export const useAdminChannels = () => {
   const { $api } = useNuxtApp()
   const channels = ref<Channel[]>([])
   const loading = ref(false)
@@ -74,6 +74,73 @@ export const useChannels = () => {
     return channels.value.find(c => c.id === id)
   }
 
+  // Additional functions for admin interface
+  const showChannelForm = ref(false)
+  const editingChannel = ref<Channel | null>(null)
+  const channelForm = ref({
+    project: '',
+    channel_type: 'call',
+    label: '',
+    link: '',
+    phone_number: '',
+    priority: 0,
+    show_in_top: false,
+    is_active: true
+  })
+
+  const editChannel = (channel: Channel) => {
+    editingChannel.value = channel
+    channelForm.value = {
+      project: channel.project || '',
+      channel_type: channel.type || 'call',
+      label: channel.label || '',
+      link: channel.link || '',
+      phone_number: channel.phone_number || '',
+      priority: channel.priority || 0,
+      show_in_top: channel.show_in_top || false,
+      is_active: channel.is_active || true
+    }
+    showChannelForm.value = true
+  }
+
+  const saveChannel = async () => {
+    try {
+      if (editingChannel.value) {
+        await updateChannel(editingChannel.value.id, channelForm.value)
+      } else {
+        await createChannel(channelForm.value)
+      }
+      closeChannelForm()
+    } catch (err) {
+      console.error('Failed to save channel:', err)
+    }
+  }
+
+  const handleDeleteChannel = async (id: number) => {
+    if (confirm('Вы уверены, что хотите удалить этот канал?')) {
+      try {
+        await deleteChannel(id)
+      } catch (err) {
+        console.error('Failed to delete channel:', err)
+      }
+    }
+  }
+
+  const closeChannelForm = () => {
+    showChannelForm.value = false
+    editingChannel.value = null
+    channelForm.value = {
+      project: '',
+      channel_type: 'call',
+      label: '',
+      link: '',
+      phone_number: '',
+      priority: 0,
+      show_in_top: false,
+      is_active: true
+    }
+  }
+
   return {
     channels,
     loading,
@@ -82,6 +149,13 @@ export const useChannels = () => {
     createChannel,
     updateChannel,
     deleteChannel,
-    getChannel
+    getChannel,
+    showChannelForm,
+    editingChannel,
+    channelForm,
+    editChannel,
+    saveChannel,
+    handleDeleteChannel,
+    closeChannelForm
   }
 }

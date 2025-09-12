@@ -56,7 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useClientAuth } from '~/composables/client/useClientAuth'
+import { useSubscription } from '~/composables/useSubscription'
 
 const { user, logout } = useClientAuth()
 const { currentPlan } = useSubscription()
