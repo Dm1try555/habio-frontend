@@ -84,7 +84,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { onMounted } from 'vue'
 import { useSchedules } from '~/composables/admin/useSchedules'
 import { useAdminProjects } from '~/composables/admin/useAdminProjects'
@@ -102,7 +102,7 @@ const {
   loadSchedules
 } = useSchedules()
 
-const { projects } = useAdminProjects()
+const { projects, loadProjects } = useAdminProjects()
 
 onMounted(async () => {
   try {
@@ -112,5 +112,11 @@ onMounted(async () => {
   } catch (e) {
     console.error('Failed to load schedules in section:', e)
   }
+})
+
+// Load projects when component is mounted
+onMounted(() => {
+  loadProjects()
+  loadSchedules()
 })
 </script>

@@ -80,33 +80,40 @@ export const useAdminChannels = () => {
   const channelForm = ref({
     project: 0,
     channel_type: 'call',
+    type: 'call',          
     label: '',
     link: '',
     phone_number: '',
     priority: 0,
     show_in_top: false,
+    is_active: true,
   })
+  
 
   const editChannel = (channel: Channel) => {
     editingChannel.value = channel
     channelForm.value = {
       project: channel.project?.id || 0,
-      channel_type: channel.type || 'call',
+      type: channel.channel_type || 'call',
+      channel_type: channel.channel_type || 'call',
       label: channel.label || '',
       link: channel.link || '',
       phone_number: channel.phone_number || '',
       priority: channel.priority || 0,
       show_in_top: channel.show_in_top || false,
+      is_active: channel.is_active || true,
     }
     showChannelForm.value = true
   }
+  
 
   const saveChannel = async () => {
     try {
+      const payload = { ...channelForm.value, type: channelForm.value.type }
       if (editingChannel.value) {
-        await updateChannel(editingChannel.value.id, channelForm.value)
+        await updateChannel(editingChannel.value.id, payload)
       } else {
-        await createChannel(channelForm.value)
+        await createChannel(payload)
       }
       closeChannelForm()
     } catch (err) {
@@ -135,6 +142,7 @@ export const useAdminChannels = () => {
       phone_number: '',
       priority: 0,
       show_in_top: false,
+      is_active: true,
     }
   }
 

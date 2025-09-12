@@ -22,12 +22,12 @@
         <tbody>
           <tr v-for="channel in channels" :key="channel.id">
             <td>{{ channel.id }}</td>
-            <td>{{ channel.channel_type }}</td>
+            <td>{{ channel.type }}</td>
             <td>{{ channel.label }}</td>
             <td>{{ channel.priority }}</td>
             <td>
-              <span :class="['status', channel.is_active ? 'status--active' : 'status--inactive']">
-                {{ channel.is_active ? 'Активен' : 'Неактивен' }}
+              <span :class="['status', channel.show_in_top ? 'status--active' : 'status--inactive']">
+                {{ channel.show_in_top ? 'Активен' : 'Неактивен' }}
               </span>
             </td>
             <td>
@@ -100,7 +100,8 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { onMounted } from 'vue'
 import { useAdminChannels } from '~/composables/admin/useAdminChannels'
 import { useAdminProjects } from '~/composables/admin/useAdminProjects'
 
@@ -112,8 +113,15 @@ const {
   editChannel,
   saveChannel,
   handleDeleteChannel,
-  closeChannelForm
+  closeChannelForm,
+  loadChannels
 } = useAdminChannels()
 
-const { projects } = useAdminProjects()
+const { projects, loadProjects } = useAdminProjects()
+
+// Load projects when component is mounted
+onMounted(() => {
+  loadProjects()
+  loadChannels()
+})
 </script>

@@ -71,8 +71,10 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import { onMounted } from 'vue'
 import { useAdminProjects } from '~/composables/admin/useAdminProjects'
+
 
 const {
   projects,
@@ -82,6 +84,12 @@ const {
   editProject,
   saveProject,
   handleDeleteProject,
-  closeProjectForm
+  closeProjectForm,
+  loadProjects
 } = useAdminProjects()
+
+// Load projects when component is mounted
+onMounted(() => {
+  loadProjects()
+})
 </script>

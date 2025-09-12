@@ -17,6 +17,7 @@ export const useAdminProjects = () => {
   const loading = ref(false)
   const error = ref<string | null>(null)
 
+  // ===== CRUD operations =====
   const loadProjects = async () => {
     try {
       loading.value = true
@@ -84,6 +85,40 @@ export const useAdminProjects = () => {
     return projects.value.find(p => p.id === id)
   }
 
+  // ===== Management form project =====
+  const showProjectForm = ref(false)
+  const editingProject = ref<Project | null>(null)
+  const projectForm = ref<Partial<Project>>({
+    name: '',
+    timezone: 'UTC',
+    is_active: true,
+  })
+
+  const editProject = (project: Project) => {
+    editingProject.value = project
+    projectForm.value = { ...project }
+    showProjectForm.value = true
+  }
+
+  const closeProjectForm = () => {
+    showProjectForm.value = false
+    editingProject.value = null
+    projectForm.value = { name: '', timezone: 'UTC', is_active: true }
+  }
+
+  const saveProject = async () => {
+    try {
+      if (editingProject.value) {
+        await updateProject(editingProject.value.id, projectForm.value)
+      } else {
+        await createProject(projectForm.value)
+      }
+      closeProjectForm()
+    } catch (err) {
+      console.error('Failed to save project:', err)
+    }
+  }
+
   return {
     projects,
     loading,
@@ -92,6 +127,14 @@ export const useAdminProjects = () => {
     createProject,
     updateProject,
     deleteProject,
-    getProject
+    getProject,
+    // management form project
+    showProjectForm,
+    editingProject,
+    projectForm,
+    editProject,
+    saveProject,
+    closeProjectForm,
+    handleDeleteProject: deleteProject 
   }
 }
