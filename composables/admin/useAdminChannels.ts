@@ -78,27 +78,25 @@ export const useAdminChannels = () => {
   const showChannelForm = ref(false)
   const editingChannel = ref<Channel | null>(null)
   const channelForm = ref({
-    project: '',
+    project: 0,
     channel_type: 'call',
     label: '',
     link: '',
     phone_number: '',
     priority: 0,
     show_in_top: false,
-    is_active: true
   })
 
   const editChannel = (channel: Channel) => {
     editingChannel.value = channel
     channelForm.value = {
-      project: channel.project || '',
+      project: channel.project?.id || 0,
       channel_type: channel.type || 'call',
       label: channel.label || '',
       link: channel.link || '',
       phone_number: channel.phone_number || '',
       priority: channel.priority || 0,
       show_in_top: channel.show_in_top || false,
-      is_active: channel.is_active || true
     }
     showChannelForm.value = true
   }
@@ -130,14 +128,13 @@ export const useAdminChannels = () => {
     showChannelForm.value = false
     editingChannel.value = null
     channelForm.value = {
-      project: '',
+      project: 0,
       channel_type: 'call',
       label: '',
       link: '',
       phone_number: '',
       priority: 0,
       show_in_top: false,
-      is_active: true
     }
   }
 

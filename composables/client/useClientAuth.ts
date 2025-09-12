@@ -1,4 +1,6 @@
 import { ref, computed } from 'vue'
+import { navigateTo } from '#app'
+
 
 export interface ClientUser {
   id: number
@@ -32,6 +34,14 @@ export const useClientAuth = () => {
       }
       
       user.value = userData
+  
+      // Redirect based on role
+      if (userData.role === 'viewer') {
+        navigateTo('/client/dashboard')
+      } else {
+        navigateTo('/client/dashboard')
+      }
+  
       return userData
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Ошибка входа'
@@ -40,6 +50,7 @@ export const useClientAuth = () => {
       isLoading.value = false
     }
   }
+  
 
   const register = async (userData: { 
     email: string; 
@@ -86,12 +97,20 @@ export const useClientAuth = () => {
       if (token && userData) {
         try {
           user.value = JSON.parse(userData)
+          
+          // Redirect if already authenticated
+          if (user.value?.role === 'viewer') {
+            navigateTo('/client/dashboard')
+          } else {
+            navigateTo('/client/dashboard')
+          }
         } catch (e) {
           logout()
         }
       }
     }
   }
+  
 
   const updateProfile = async (data: Partial<ClientUser>) => {
     try {

@@ -74,7 +74,7 @@
           <select v-model="userForm.role" required>
             <option value="admin">Администратор</option>
             <option value="marketing">Маркетинг</option>
-            <option value="viewer">Клиент</option>
+            <option value="client">Клиент</option>
           </select>
         </div>
         <div class="form-group">

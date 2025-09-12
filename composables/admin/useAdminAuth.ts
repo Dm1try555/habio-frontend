@@ -66,7 +66,7 @@ export const useAuth = () => {
       userRoleCookie.value = null
 
       // Real API authentication
-      const response = await $api.post('admin/auth/login/', {
+      const response = await $api.post('auth/login/', {
         email: data.email,
         password: data.password,
         role: data.role,

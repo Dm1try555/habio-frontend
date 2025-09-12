@@ -23,7 +23,7 @@
       <div class="header-right">
         <div class="user-menu">
           <div class="user-info">
-            <span class="user-name">{{ user?.name || 'Пользователь' }}</span>
+            <span class="user-name">{{ user?.first_name || 'Пользователь' }}</span>
             <span class="user-plan">{{ subscriptionType === 'free' ? 'Бесплатно' : 'Премиум' }}</span>
           </div>
           
@@ -68,8 +68,8 @@ const showUserMenu = ref(false)
 const subscriptionType = computed(() => currentPlan.value?.type || 'free')
 
 const userInitials = computed(() => {
-  if (!user.value?.name) return 'U'
-  return user.value.name
+  if (!user.value?.first_name) return 'U'
+  return user.value.first_name
     .split(' ')
     .map(name => name[0])
     .join('')
