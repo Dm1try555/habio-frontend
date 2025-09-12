@@ -1,5 +1,7 @@
 <template>
   <div class="client-page">
+    <ClientDashboardHeader />
+
     <div class="client-header">
       <h1>Панель клиента</h1>
       <p>Добро пожаловать, {{ user?.first_name }} {{ user?.last_name }}!</p>
@@ -34,42 +36,28 @@
         <div class="action-card">
           <h3>Настройки</h3>
           <p>Управление настройками аккаунта</p>
-          <button class="btn-primary" @click="navigateTo('/client/settings')">Перейти</button>
-        </div>
-        <div class="action-card">
-          <h3>Выйти</h3>
-          <p>Выйти из аккаунта</p>
-          <button class="btn-primary btn--danger" @click="handleLogout">Выйти</button>
+          <button class="btn-primary" @click="goToSettings">Перейти</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import ClientDashboardHeader from '~/components/client/dashboard/ClientDashboardHeader.vue'
 import { useRouter } from 'vue-router'
 import { useClientAuth } from '~/composables/client/useClientAuth'
 
 const router = useRouter()
-const { user, logout } = useClientAuth()
+const { user } = useClientAuth()
 
-const navigateTo = (path) => {
+const navigateTo = (path: string) => {
   router.push(path)
 }
 
-const handleLogout = () => {
-  logout()
-  router.push('/client/auth/login')
+const goToSettings = () => {
+  router.push('/client/settings')
 }
 </script>
 
-<style src="~/assets/css/client/index.css"></style>
-<style scoped>
-.btn--danger {
-  background: #dc3545 !important;
-}
-
-.btn--danger:hover {
-  background: #c82333 !important;
-}
-</style>
+<style scoped src="~/assets/css/client/client-dashboard.css"></style>

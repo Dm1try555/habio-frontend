@@ -18,23 +18,25 @@ export const useClientAuth = () => {
 
   const isAuthenticated = computed(() => !!user.value)
 
+  // ==================== LOGIN ====================
   const login = async (credentials: { email: string; password: string }) => {
     try {
       isLoading.value = true
       error.value = null
-      
+
       const response = await $api.post('/auth/login/', credentials)
-      const { user: userData, token, refresh_token } = response.data
-      
+      const { user: userData, access, refresh } = response.data
+
+      // сохраняем токены и пользователя
       if (typeof window !== 'undefined') {
-        localStorage.setItem('client_token', token)
-        localStorage.setItem('client_refresh_token', refresh_token)
+        localStorage.setItem('client_token', access)
+        localStorage.setItem('client_refresh_token', refresh)
         localStorage.setItem('client_user', JSON.stringify(userData))
       }
-      
-      user.value = userData
-      navigateTo('/client/dashboard')
 
+      user.value = userData
+
+      navigateTo('/client/dashboard')
       return userData
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Ошибка входа'
@@ -44,55 +46,46 @@ export const useClientAuth = () => {
     }
   }
 
-  const register = async (userData: { 
-    email: string; 
-    password: string; 
-    first_name: string; 
-    last_name: string 
-  }) => {
+  // ==================== LOGOUT ====================
+  const logout = async () => {
     try {
-      isLoading.value = true
-      error.value = null
-
-      const response = await $api.post('/auth/register/', userData)
-      const { user: newUser, token } = response.data
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('client_token', token)
-        localStorage.setItem('client_user', JSON.stringify(newUser))
+      const refreshToken = localStorage.getItem('client_refresh_token')
+      const accessToken = localStorage.getItem('client_token')
+  
+      if (refreshToken && accessToken) {
+        await $api.post(
+          '/auth/logout/',
+          { refresh: refreshToken },
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          }
+        )
       }
-
-      user.value = newUser
-      navigateTo('/client/dashboard')
-      return newUser
-    } catch (err: any) {
-      error.value = err.response?.data?.detail || 'Ошибка регистрации'
-      throw err
+    } catch (err) {
+      console.warn('Серверный logout не прошел, очищаем локально', err)
     } finally {
-      isLoading.value = false
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('client_token')
+        localStorage.removeItem('client_refresh_token')
+        localStorage.removeItem('client_user')
+      }
+      user.value = null
+      navigateTo('/client/auth/login')
     }
   }
+  
 
-  const logout = (router?: any) => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('client_token')
-      localStorage.removeItem('client_refresh_token')
-      localStorage.removeItem('client_user')
-    }
-    user.value = null
-
-    if (router) router.push('/auth/login')
-  }
-
+  // ==================== CHECK AUTH ====================
   const checkAuth = () => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('client_token')
       const userData = localStorage.getItem('client_user')
-      
+
       if (token && userData) {
         try {
           user.value = JSON.parse(userData)
-          navigateTo('/client/dashboard')
         } catch (e) {
           logout()
         }
@@ -100,31 +93,7 @@ export const useClientAuth = () => {
     }
   }
 
-  const updateProfile = async (data: Partial<ClientUser>) => {
-    try {
-      isLoading.value = true
-      error.value = null
-
-      const response = await $api.put('/auth/profile/', data)
-      const updatedUser = response.data
-
-      user.value = updatedUser
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('client_user', JSON.stringify(updatedUser))
-      }
-
-      return updatedUser
-    } catch (err: any) {
-      error.value = err.response?.data?.detail || 'Ошибка обновления профиля'
-      throw err
-    } finally {
-      isLoading.value = false
-    }
-  }
-
-  if (typeof window !== 'undefined') {
-    checkAuth()
-  }
+  if (typeof window !== 'undefined') checkAuth()
 
   return {
     user,
@@ -132,9 +101,7 @@ export const useClientAuth = () => {
     error,
     isAuthenticated,
     login,
-    register,
-    logout,      
+    logout,
     checkAuth,
-    updateProfile,
   }
 }
