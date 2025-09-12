@@ -18,6 +18,39 @@ export const useClientAuth = () => {
 
   const isAuthenticated = computed(() => !!user.value)
 
+  // ==================== REGISTER ====================
+const register = async (userData: { 
+  email: string; 
+  password: string; 
+  first_name: string; 
+  last_name: string 
+}) => {
+  try {
+    isLoading.value = true
+    error.value = null
+
+    const response = await $api.post('/auth/register/', userData)
+    const { user: newUser, access, refresh } = response.data
+
+    // сохраняем токены и пользователя
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('client_token', access)
+      localStorage.setItem('client_refresh_token', refresh)
+      localStorage.setItem('client_user', JSON.stringify(newUser))
+    }
+
+    user.value = newUser
+    navigateTo('/client/dashboard')
+    return newUser
+  } catch (err: any) {
+    error.value = err.response?.data?.detail || 'Ошибка регистрации'
+    throw err
+  } finally {
+    isLoading.value = false
+  }
+}
+
+
   // ==================== LOGIN ====================
   const login = async (credentials: { email: string; password: string }) => {
     try {
@@ -101,6 +134,7 @@ export const useClientAuth = () => {
     error,
     isAuthenticated,
     login,
+    register,
     logout,
     checkAuth,
   }
