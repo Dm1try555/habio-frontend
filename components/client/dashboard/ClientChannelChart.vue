@@ -80,7 +80,7 @@ const getChannelName = (channel: string): string => {
 }
 
 const getChannelColor = (index: number): string => {
-  return channelColors[index % channelColors.length]
+  return channelColors[index % channelColors.length] || '#667eea'
 }
 
 const getBarWidth = (clicks: number): number => {

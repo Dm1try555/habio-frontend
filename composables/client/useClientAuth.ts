@@ -1,7 +1,6 @@
 import { ref, computed } from 'vue'
 import { navigateTo } from '#app'
 
-
 export interface ClientUser {
   id: number
   email: string
@@ -25,23 +24,17 @@ export const useClientAuth = () => {
       error.value = null
       
       const response = await $api.post('/auth/login/', credentials)
-      const { user: userData, token } = response.data
+      const { user: userData, token, refresh_token } = response.data
       
-      // Store token
       if (typeof window !== 'undefined') {
         localStorage.setItem('client_token', token)
+        localStorage.setItem('client_refresh_token', refresh_token)
         localStorage.setItem('client_user', JSON.stringify(userData))
       }
       
       user.value = userData
-  
-      // Redirect based on role
-      if (userData.role === 'viewer') {
-        navigateTo('/client/dashboard')
-      } else {
-        navigateTo('/client/dashboard')
-      }
-  
+      navigateTo('/client/dashboard')
+
       return userData
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Ошибка входа'
@@ -50,7 +43,6 @@ export const useClientAuth = () => {
       isLoading.value = false
     }
   }
-  
 
   const register = async (userData: { 
     email: string; 
@@ -61,17 +53,17 @@ export const useClientAuth = () => {
     try {
       isLoading.value = true
       error.value = null
-      
+
       const response = await $api.post('/auth/register/', userData)
       const { user: newUser, token } = response.data
-      
-      // Store token
+
       if (typeof window !== 'undefined') {
         localStorage.setItem('client_token', token)
         localStorage.setItem('client_user', JSON.stringify(newUser))
       }
-      
+
       user.value = newUser
+      navigateTo('/client/dashboard')
       return newUser
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Ошибка регистрации'
@@ -81,12 +73,15 @@ export const useClientAuth = () => {
     }
   }
 
-  const logout = () => {
+  const logout = (router?: any) => {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('client_token')
+      localStorage.removeItem('client_refresh_token')
       localStorage.removeItem('client_user')
     }
     user.value = null
+
+    if (router) router.push('/auth/login')
   }
 
   const checkAuth = () => {
@@ -97,34 +92,27 @@ export const useClientAuth = () => {
       if (token && userData) {
         try {
           user.value = JSON.parse(userData)
-          
-          // Redirect if already authenticated
-          if (user.value?.role === 'viewer') {
-            navigateTo('/client/dashboard')
-          } else {
-            navigateTo('/client/dashboard')
-          }
+          navigateTo('/client/dashboard')
         } catch (e) {
           logout()
         }
       }
     }
   }
-  
 
   const updateProfile = async (data: Partial<ClientUser>) => {
     try {
       isLoading.value = true
       error.value = null
-      
+
       const response = await $api.put('/auth/profile/', data)
       const updatedUser = response.data
-      
+
       user.value = updatedUser
       if (typeof window !== 'undefined') {
         localStorage.setItem('client_user', JSON.stringify(updatedUser))
       }
-      
+
       return updatedUser
     } catch (err: any) {
       error.value = err.response?.data?.detail || 'Ошибка обновления профиля'
@@ -134,7 +122,6 @@ export const useClientAuth = () => {
     }
   }
 
-  // Initialize auth on mount
   if (typeof window !== 'undefined') {
     checkAuth()
   }
@@ -146,8 +133,8 @@ export const useClientAuth = () => {
     isAuthenticated,
     login,
     register,
-    logout,
+    logout,      
     checkAuth,
-    updateProfile
+    updateProfile,
   }
 }
