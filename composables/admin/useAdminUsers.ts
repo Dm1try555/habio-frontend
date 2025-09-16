@@ -6,6 +6,7 @@ export interface User {
   first_name: string
   last_name: string
   role: 'admin' | 'marketing' | 'viewer'
+  plan?: 'free' | 'pro'
   is_active: boolean
   created_at: string
   updated_at: string
@@ -93,6 +94,7 @@ export const useAdminUsers = () => {
     last_name: '',
     password: '',
     role: 'viewer' as 'admin' | 'marketing' | 'viewer',
+    plan: 'free' as 'free' | 'pro',
     is_active: true
   })
 
@@ -104,6 +106,7 @@ export const useAdminUsers = () => {
       last_name: user.last_name,
       password: '',
       role: user.role,
+      plan: (user.plan as any) || 'free',
       is_active: user.is_active
     }
     showUserForm.value = true
@@ -146,6 +149,7 @@ export const useAdminUsers = () => {
       last_name: '',
       password: '',
       role: 'viewer',
+      plan: 'free',
       is_active: true
     }
   }
@@ -154,7 +158,7 @@ export const useAdminUsers = () => {
     const roles = {
       admin: 'Администратор',
       marketing: 'Маркетинг',
-      viewer: 'Viewer'
+      viewer: 'Клиент'
     }
     return roles[role as keyof typeof roles] || role
   }

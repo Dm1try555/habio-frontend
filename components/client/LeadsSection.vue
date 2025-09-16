@@ -1,10 +1,10 @@
 <template>
-  <div class="admin-section">
-    <div class="admin-section__header">
+  <div class="client-section">
+    <div class="client-section__header">
       <h2>Лиды</h2>
     </div>
     
-    <div class="admin-table">
+    <div class="client-table">
       <table>
         <thead>
           <tr>
@@ -53,8 +53,8 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import { useAdminLeads } from '~/composables/admin/useAdminLeads'
-import { useAdminChat } from '~/composables/admin/useAdminChat'
+import { useLeads } from '~/composables/client/useLeads'
+import { useChat } from '~/composables/client/useChat'
 
 const {
   leads,
@@ -64,9 +64,9 @@ const {
   getContactMessage,
   toggleLeadStatus,
   handleDeleteLead
-} = useAdminLeads()
+} = useLeads()
 
-const { formatDate } = useAdminChat()
+const { formatDate } = useChat()
 
 onMounted(async () => {
   try {

@@ -8,20 +8,36 @@
       <div class="link-group">
         <a href="/admin/login" class="test-link">Вход в админку</a>
         <a href="/admin/admin/dashboard" class="test-link">Дашборд админа</a>
+        <a href="/admin/admin/analytics" class="test-link">Аналитика</a>
+        <a href="/admin/admin/payments" class="test-link">Пейменты</a>
+        <a href="/admin/admin/settings" class="test-link">Настройки</a>
+        <a href="/admin/admin/users" class="test-link">Юзеры</a>
+      </div>
+
+      <h2>Маркетинг</h2>
+      <div class="link-group">
         <a href="/admin/marketing/dashboard" class="test-link">Дашборд маркетинга</a>
+        <a href="/admin/marketing/channels" class="test-link">Каналы</a>
+        <a href="/admin/marketing/settings" class="test-link">Настройки</a>
       </div>
       
       <h2>Клиентская система</h2>
       <div class="link-group">
         <a href="/client/auth/login" class="test-link">Вход клиента</a>
         <a href="/client/auth/register" class="test-link">Регистрация клиента</a>
+        <a href="/client/analytics" class="test-link">Аналитика</a>
+        <a href="/client/chat" class="test-link">Чат</a>
         <a href="/client/dashboard" class="test-link">Дашборд клиента</a>
+        <a href="/client/leads" class="test-link">Лиды</a>
+        <a href="/client/pricing" class="test-link">Тариф</a>
+        <a href="/client/projects" class="test-link">Проекты</a>
+        <a href="/client/settings" class="test-link">Настройки</a>
+        <a href="/client/settings/channels" class="test-link">Настройки каналов</a>
+        <a href="/client/settings/languages" class="test-link">Настройки языков</a>
+        <a href="/client/settings/schedule" class="test-link">Настройки расписания</a>
+        <a href="/client/settings/widget" class="test-link">Настройки виджета</a>
       </div>
       
-      <h2>Управление пользователями</h2>
-      <div class="link-group">
-        <a href="/admin/admin/users" class="test-link">Управление пользователями</a>
-      </div>
     </div>
   </div>
 </template>

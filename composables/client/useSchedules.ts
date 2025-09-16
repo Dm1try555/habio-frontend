@@ -84,7 +84,7 @@ export const useSchedules = () => {
     return schedules.value.find(s => s.id === id)
   }
 
-  // Additional functions for admin interface
+  // Additional functions for client interface
   const showScheduleForm = ref(false)
   const editingSchedule = ref<Schedule | null>(null)
   const scheduleForm = ref({

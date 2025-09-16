@@ -1,12 +1,12 @@
 <template>
-  <div class="demo-page">
-    <header class="demo-header">
+  <div class="universal-page">
+    <header class="universal-page-header">
       <h1>HABIO-CHAT Demo</h1>
       <p>Умный виджет связи с адаптивным роутингом каналов</p>
     </header>
 
-    <main class="demo-content">
-      <section class="demo-section">
+    <main class="universal-page-content">
+      <section class="universal-section">
         <h2>О продукте</h2>
         <p>
           HABIO-CHAT - это единый виджет "Кнопка связи", который показывает пользователю 
@@ -15,7 +15,7 @@
         </p>
       </section>
 
-      <section class="demo-section">
+      <section class="universal-section">
         <h2>Ключевые возможности</h2>
         <div class="features-grid">
           <div class="feature-card">
@@ -37,7 +37,7 @@
         </div>
       </section>
 
-      <section class="demo-section">
+      <section class="universal-section">
         <h2>Демонстрация виджета</h2>
         <p>
           Виджет находится в правом нижнем углу страницы. 
@@ -50,24 +50,6 @@
             <li>Устройство: {{ deviceType }}</li>
             <li>Статус: {{ isOnline ? 'Онлайн' : 'Офлайн' }}</li>
           </ul>
-        </div>
-      </section>
-
-      <section class="demo-section">
-        <h2>API Endpoints</h2>
-        <div class="api-endpoints">
-          <div class="endpoint">
-            <code>GET /api/widget/{project_id}/channels/</code>
-            <span>Получить каналы для проекта</span>
-          </div>
-          <div class="endpoint">
-            <code>POST /api/widget/{project_id}/create_lead/</code>
-            <span>Создать лид</span>
-          </div>
-          <div class="endpoint">
-            <code>POST /api/widget/{project_id}/create_callback/</code>
-            <span>Создать заявку на звонок</span>
-          </div>
         </div>
       </section>
     </main>
@@ -119,7 +101,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-@import '~/assets/css/shared/demo-page.css';
-@import '~/assets/css/shared/demo-features.css';
-@import '~/assets/css/shared/demo-api.css';
+/* Demo styles moved to inline styles */
 </style>

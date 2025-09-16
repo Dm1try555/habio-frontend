@@ -50,6 +50,7 @@ import type { Channel } from '~/composables/shared/useWidgetConfig'
 import { useWidgetConfig } from '~/composables/shared/useWidgetConfig'
 import { useWidgetAnalytics } from '~/composables/shared/useWidgetAnalytics'
 import { useChannelMemory } from '~/composables/shared/useChannelMemory'
+
 import HabioFab from '~/components/HabioFab.vue'
 import HabioPanel from '~/components/HabioPanel.vue'
 import HabioCallbackForm from '~/components/HabioCallbackForm.vue'

@@ -1,36 +1,29 @@
 <template>
   <Teleport to="body">
-    <Transition name="modal" appear>
-      <div v-if="isOpen" class="modal-overlay" @click="handleOverlayClick">
-        <div
-          ref="modalRef"
-          class="modal-container"
-          :class="modalClasses"
-          role="dialog"
-          :aria-labelledby="titleId"
-          :aria-describedby="descriptionId"
-          @click.stop
-        >
-          <div class="modal-header" v-if="$slots.header || title">
+    <Transition name="modal">
+      <div v-if="isOpen" class="base-modal-overlay" @click="handleOverlayClick">
+        <div class="base-modal-container" :class="containerClass" @click.stop>
+          <div class="base-modal-header" v-if="title || $slots.header">
             <slot name="header">
-              <h3 :id="titleId" class="modal-title">{{ title }}</h3>
+              <h3 class="base-modal-title">{{ title }}</h3>
             </slot>
-            <button
-              v-if="closable"
-              type="button"
-              class="modal-close"
-              :aria-label="closeLabel"
-              @click="close"
+            <button 
+              v-if="showClose"
+              @click="handleClose" 
+              class="base-modal-close"
+              aria-label="Закрыть"
             >
-              <span class="modal-close-icon">×</span>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M15.5 4.5L4.5 15.5M4.5 4.5l11 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
             </button>
           </div>
           
-          <div class="modal-body" :id="descriptionId">
+          <div class="base-modal-body">
             <slot />
           </div>
           
-          <div v-if="$slots.footer" class="modal-footer">
+          <div v-if="$slots.footer" class="base-modal-footer">
             <slot name="footer" />
           </div>
         </div>
@@ -40,26 +33,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useId, watch, nextTick } from 'vue'
-
 interface Props {
   isOpen: boolean
   title?: string
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
-  closable?: boolean
+  showClose?: boolean
   closeOnOverlay?: boolean
-  closeOnEscape?: boolean
-  closeLabel?: string
-  preventScroll?: boolean
+  containerClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  size: 'md',
-  closable: true,
-  closeOnOverlay: true,
-  closeOnEscape: true,
-  closeLabel: 'Close modal',
-  preventScroll: true
+  showClose: true,
+  closeOnOverlay: true
 })
 
 const emit = defineEmits<{
@@ -67,211 +51,124 @@ const emit = defineEmits<{
   'update:isOpen': [value: boolean]
 }>()
 
-const modalRef = ref<HTMLElement>()
-const titleId = useId()
-const descriptionId = useId()
-
-const modalClasses = computed(() => {
-  const classes = ['modal-container']
-  classes.push(`modal-${props.size}`)
-  return classes
-})
-
-const close = () => {
+const handleClose = () => {
   emit('close')
   emit('update:isOpen', false)
 }
 
 const handleOverlayClick = () => {
   if (props.closeOnOverlay) {
-    close()
+    handleClose()
   }
 }
-
-const handleEscape = (event: KeyboardEvent) => {
-  if (event.key === 'Escape' && props.closeOnEscape) {
-    close()
-  }
-}
-
-const focusModal = async () => {
-  await nextTick()
-  modalRef.value?.focus()
-}
-
-const preventBodyScroll = (prevent: boolean) => {
-  if (typeof document === 'undefined') return
-  
-  if (prevent) {
-    document.body.style.overflow = 'hidden'
-  } else {
-    document.body.style.overflow = ''
-  }
-}
-
-watch(() => props.isOpen, (isOpen) => {
-  if (isOpen) {
-    document.addEventListener('keydown', handleEscape)
-    if (props.preventScroll) {
-      preventBodyScroll(true)
-    }
-    focusModal()
-  } else {
-    document.removeEventListener('keydown', handleEscape)
-    if (props.preventScroll) {
-      preventBodyScroll(false)
-    }
-  }
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleEscape)
-  if (props.preventScroll) {
-    preventBodyScroll(false)
-  }
-})
 </script>
 
 <style scoped>
-.modal-overlay {
+.base-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: var(--z-modal);
-  padding: 1rem;
+  z-index: 1000;
+  padding: 20px;
 }
 
-.modal-container {
-  background: var(--color-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
+.base-modal-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 500px;
+  width: 100%;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 100%;
 }
 
-.modal-sm {
-  max-width: 24rem;
-}
-
-.modal-md {
-  max-width: 32rem;
-}
-
-.modal-lg {
-  max-width: 48rem;
-}
-
-.modal-xl {
-  max-width: 64rem;
-}
-
-.modal-full {
-  max-width: 95vw;
-  max-height: 95vh;
-}
-
-.modal-header {
+.base-modal-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.5rem 1.5rem 0 1.5rem;
-  border-bottom: 1px solid var(--color-gray-200);
-  margin-bottom: 1.5rem;
+  padding: 24px 24px 0 24px;
+  margin-bottom: 20px;
 }
 
-.modal-title {
-  font-size: 1.25rem;
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-gray-900);
+.base-modal-title {
   margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1f2937;
 }
 
-.modal-close {
+.base-modal-close {
   background: none;
   border: none;
-  padding: 0.5rem;
+  padding: 8px;
   cursor: pointer;
-  border-radius: var(--radius-md);
-  color: var(--color-gray-400);
-  transition: all var(--transition-fast);
+  color: #6b7280;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
-.modal-close:hover {
-  background-color: var(--color-gray-100);
-  color: var(--color-gray-600);
+.base-modal-close:hover {
+  background: #f3f4f6;
+  color: #374151;
 }
 
-.modal-close-icon {
-  font-size: 1.5rem;
-  line-height: 1;
-}
-
-.modal-body {
-  padding: 0 1.5rem;
+.base-modal-body {
+  padding: 0 24px;
   flex: 1;
   overflow-y: auto;
 }
 
-.modal-footer {
-  padding: 1.5rem;
-  border-top: 1px solid var(--color-gray-200);
-  margin-top: 1.5rem;
+.base-modal-footer {
+  padding: 20px 24px 24px 24px;
+  border-top: 1px solid #e5e7eb;
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
   justify-content: flex-end;
 }
 
-/* Transitions */
+/* Modal transitions */
 .modal-enter-active,
 .modal-leave-active {
-  transition: all var(--transition-normal);
+  transition: all 0.3s ease;
 }
 
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-  transform: scale(0.95);
 }
 
-.modal-enter-to,
-.modal-leave-from {
-  opacity: 1;
-  transform: scale(1);
+.modal-enter-from .base-modal-container,
+.modal-leave-to .base-modal-container {
+  transform: scale(0.95) translateY(-20px);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-  .modal-overlay {
-    padding: 0.5rem;
+  .base-modal-overlay {
+    padding: 10px;
   }
   
-  .modal-container {
-    max-height: 95vh;
+  .base-modal-container {
+    max-width: 100%;
   }
   
-  .modal-header,
-  .modal-body,
-  .modal-footer {
-    padding-left: 1rem;
-    padding-right: 1rem;
+  .base-modal-header,
+  .base-modal-body,
+  .base-modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
   }
   
-  .modal-footer {
+  .base-modal-footer {
     flex-direction: column;
-  }
-  
-  .modal-footer .btn {
-    width: 100%;
   }
 }
 </style>

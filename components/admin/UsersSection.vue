@@ -15,6 +15,7 @@
             <th>Email</th>
             <th>Имя</th>
             <th>Роль</th>
+            <th>План</th>
             <th>Статус</th>
             <th>Действия</th>
           </tr>
@@ -31,6 +32,12 @@
               >
                 {{ getRoleName(user.role) }}
               </span>
+            </td>
+            <td>
+              <select class="base-input" v-model="user.plan" @change="onChangePlan(user)">
+                <option value="free">Free</option>
+                <option value="pro">Pro</option>
+              </select>
             </td>
             <td>
               <span :class="['status', user.is_active ? 'status--active' : 'status--inactive']">
@@ -54,27 +61,34 @@
       <form @submit.prevent="saveUser">
         <div class="form-group">
           <label>Email</label>
-          <input v-model="userForm.email" type="email" required />
+          <input class="form-input" v-model="userForm.email" type="email" required />
         </div>
         <div class="form-group">
           <label>Имя</label>
-          <input v-model="userForm.first_name" type="text" required />
+          <input class="form-input" v-model="userForm.first_name" type="text" required />
         </div>
         <div class="form-group">
           <label>Фамилия</label>
-          <input v-model="userForm.last_name" type="text" required />
+          <input class="form-input" v-model="userForm.last_name" type="text" required />
         </div>
         <div class="form-group">
           <label>Пароль</label>
-          <input v-model="userForm.password" type="password" :required="!editingUser" />
+          <input class="form-input" v-model="userForm.password" type="password" :required="!editingUser" />
           <small v-if="editingUser" class="form-hint">Оставьте пустым, чтобы не изменять пароль</small>
         </div>
         <div class="form-group">
           <label>Роль</label>
-          <select v-model="userForm.role" required>
+          <select class="form-input" v-model="userForm.role" required>
             <option value="admin">Администратор</option>
             <option value="marketing">Маркетинг</option>
-            <option value="client">Клиент</option>
+            <option value="viewer">Клиент</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>План</label>
+          <select class="form-input" v-model="userForm.plan">
+            <option value="free">Free</option>
+            <option value="pro">Pro</option>
           </select>
         </div>
         <div class="form-group">
@@ -107,7 +121,8 @@ const {
   closeUserForm,
   getRoleName,
   getRoleColor,
-  loadUsers
+  loadUsers,
+  updateUser
 } = useAdminUsers()
 
 onMounted(async () => {
@@ -119,4 +134,10 @@ onMounted(async () => {
     console.error('Failed to load users in section:', e)
   }
 })
+
+const onChangePlan = async () => {
+  try {
+    await updateUser(u.id, { plan: u.plan })
+  } catch (e) {}
+}
 </script>

@@ -1,32 +1,49 @@
 <template>
-  <div class="languages-settings">
-    <div class="settings-header">
-      <h1>Языки</h1>
-    </div>
-
-    <div class="settings-content">
-      <div class="languages-list">
-        <div class="language-item" v-for="language in languages" :key="language.code">
-          <div class="language-info">
-            <div class="language-flag">{{ language.flag }}</div>
-            <div class="language-details">
-              <h3>{{ language.name }}</h3>
-              <p>{{ language.nativeName }}</p>
+  <div class="universal-page">
+    <div class="universal-page-content">
+      <div class="universal-page-header">
+        <h1>Языки</h1>
+        <div v-if="!canAccessFeature('languages')" class="upgrade-banner">
+          <div class="upgrade-content">
+            <span class="upgrade-icon">🔒</span>
+            <div class="upgrade-text">
+              <h3>Доступно в Pro тарифе</h3>
+              <p>Настройка языков доступна только в платном тарифе</p>
+              <button @click="goToPricing" class="upgrade-button">Перейти к тарифам</button>
             </div>
           </div>
-          <div class="language-actions">
-            <label class="toggle">
-              <input type="checkbox" v-model="language.enabled" />
-              <span class="toggle-slider"></span>
-            </label>
-            <button @click="editLanguage(language)" class="btn-edit">Редактировать</button>
+        </div>
+      </div>
+
+      <div class="universal-settings-content" v-if="canAccessFeature('languages')">
+        <div class="universal-section">
+          <div class="universal-section-header">
+            <h2 class="universal-section-title">Настройка языков</h2>
+          </div>
+          <div class="languages-list">
+            <div class="language-item" v-for="language in languages" :key="language.code">
+              <div class="language-info">
+                <div class="language-flag">{{ language.flag }}</div>
+                <div class="language-details">
+                  <h3>{{ language.name }}</h3>
+                  <p>{{ language.nativeName }}</p>
+                </div>
+              </div>
+              <div class="language-actions">
+                <label class="toggle">
+                  <input type="checkbox" v-model="language.enabled" />
+                  <span class="toggle-slider"></span>
+                </label>
+                <button @click="editLanguage(language)" class="btn-edit">Редактировать</button>
+              </div>
+            </div>
+
+            <button @click="addLanguage" class="btn-add-language">
+              <span>+</span>
+              Добавить язык
+            </button>
           </div>
         </div>
-
-        <button @click="addLanguage" class="btn-add-language">
-          <span>+</span>
-          Добавить язык
-        </button>
       </div>
     </div>
   </div>
@@ -35,8 +52,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useClientAuth } from '~/composables/client/useClientAuth'
+import { useSubscription } from '~/composables/useSubscription'
 
 const { user, isAuthenticated } = useClientAuth()
+const { canAccessFeature } = useSubscription()
 
 const languages = ref([
   {
@@ -84,6 +103,10 @@ const addLanguage = () => {
   console.log('Add new language')
 }
 
+const goToPricing = () => {
+  navigateTo('/client/pricing')
+}
+
 onMounted(async () => {
   if (!isAuthenticated.value) {
     await navigateTo('/client/auth/login')
@@ -93,25 +116,10 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.languages-settings {
-  min-height: 100vh;
-  background: #f8f9fa;
-  padding: 24px;
-}
+/* Import universal styles */
+@import '~/assets/css/shared/pages.css';
 
-.settings-header {
-  margin-bottom: 32px;
-}
-
-.settings-header h1 {
-  margin: 0;
-  color: #1a1a1a;
-}
-
-.settings-content {
-  max-width: 800px;
-}
-
+/* Language-specific styles */
 .languages-list {
   display: flex;
   flex-direction: column;
@@ -235,5 +243,49 @@ onMounted(async () => {
 
 .btn-add-language span {
   font-size: 20px;
+}
+
+.upgrade-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 16px;
+  color: white;
+}
+
+.upgrade-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.upgrade-icon {
+  font-size: 32px;
+}
+
+.upgrade-text h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+}
+
+.upgrade-text p {
+  margin: 0 0 16px 0;
+  opacity: 0.9;
+}
+
+.upgrade-button {
+  background: white;
+  color: #667eea;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.upgrade-button:hover {
+  background: #f8f9fa;
+  transform: translateY(-1px);
 }
 </style>

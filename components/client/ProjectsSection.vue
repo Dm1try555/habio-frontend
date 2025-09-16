@@ -1,13 +1,13 @@
 <template>
-  <div class="admin-section">
-    <div class="admin-section__header">
+  <div class="client-section">
+    <div class="client-section__header">
       <h2>Проекты</h2>
       <button @click="showProjectForm = true" class="btn btn--primary">
         Создать проект
       </button>
     </div>
     
-    <div class="admin-table">
+    <div class="client-table">
       <table>
         <thead>
           <tr>
@@ -73,8 +73,7 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useAdminProjects } from '~/composables/admin/useAdminProjects'
-
+import { useProjects } from '~/composables/client/useProjects'
 
 const {
   projects,
@@ -86,7 +85,7 @@ const {
   handleDeleteProject,
   closeProjectForm,
   loadProjects
-} = useAdminProjects()
+} = useProjects()
 
 // Load projects when component is mounted
 onMounted(() => {

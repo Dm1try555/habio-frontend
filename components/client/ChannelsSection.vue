@@ -1,13 +1,13 @@
 <template>
-  <div class="admin-section">
-    <div class="admin-section__header">
+  <div class="client-section">
+    <div class="client-section__header">
       <h2>Каналы</h2>
       <button @click="showChannelForm = true" class="btn btn--primary">
         Добавить канал
       </button>
     </div>
     
-    <div class="admin-table">
+    <div class="client-table">
       <table>
         <thead>
           <tr>
@@ -102,8 +102,8 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useAdminChannels } from '~/composables/admin/useAdminChannels'
-import { useAdminProjects } from '~/composables/admin/useAdminProjects'
+import { useChannels } from '~/composables/client/useChannels'
+import { useProjects } from '~/composables/client/useProjects'
 
 const {
   channels,
@@ -115,9 +115,9 @@ const {
   handleDeleteChannel,
   closeChannelForm,
   loadChannels
-} = useAdminChannels()
+} = useChannels()
 
-const { projects, loadProjects } = useAdminProjects()
+const { projects, loadProjects } = useProjects()
 
 // Load projects when component is mounted
 onMounted(() => {

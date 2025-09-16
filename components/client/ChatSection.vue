@@ -1,6 +1,6 @@
 <template>
-  <div class="admin-section">
-    <div class="admin-section__header">
+  <div class="client-section">
+    <div class="client-section__header">
       <h2>Чат с клиентами</h2>
     </div>
     
@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { useChat } from '~/composables/admin/useChat'
+import { useChat } from '~/composables/client/useChat'
 
 const {
   chatSessions,

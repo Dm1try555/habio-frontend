@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import type { Channel } from '../shared/useWidgetConfig'
 
-export const useAdminChannels = () => {
+export const useChannels = () => {
   const { $api } = useNuxtApp()
   const channels = ref<Channel[]>([])
   const loading = ref(false)
@@ -74,7 +74,7 @@ export const useAdminChannels = () => {
     return channels.value.find(c => c.id === id)
   }
 
-  // Additional functions for admin interface
+  // Additional functions for client interface
   const showChannelForm = ref(false)
   const editingChannel = ref<Channel | null>(null)
   const channelForm = ref({

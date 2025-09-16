@@ -11,7 +11,7 @@ export interface Project {
   updated_at: string
 }
 
-export const useAdminProjects = () => {
+export const useProjects = () => {
   const { $api } = useNuxtApp()
   const projects = ref<Project[]>([])
   const loading = ref(false)

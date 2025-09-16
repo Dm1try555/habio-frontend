@@ -1,9 +1,5 @@
 /* HABIO-CHAT - Main CSS File */
 
-/* Demo Page Styles */
-@import './demo-page.css';
-@import './demo-features.css';
-@import './demo-api.css';
 
 /* Global Styles */
 * {

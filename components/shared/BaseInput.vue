@@ -1,19 +1,13 @@
 <template>
-  <div class="form-group" :class="{ 'has-error': hasError, 'has-success': hasSuccess }">
-    <label v-if="label" :for="inputId" class="form-label" :class="{ required }">
+  <div class="base-input-group" :class="groupClass">
+    <label v-if="label" :for="inputId" class="base-input-label">
       {{ label }}
+      <span v-if="required" class="required-asterisk">*</span>
     </label>
     
-    <div class="input-wrapper" :class="wrapperClasses">
-      <div v-if="prefixIcon || $slots.prefix" class="input-prefix">
-        <slot name="prefix">
-          <span v-if="prefixIcon" class="input-icon">{{ prefixIcon }}</span>
-        </slot>
-      </div>
-      
+    <div class="base-input-wrapper">
       <input
         :id="inputId"
-        ref="inputRef"
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
@@ -27,61 +21,57 @@
         :maxlength="maxLength"
         :pattern="pattern"
         :autocomplete="autocomplete"
-        :class="inputClasses"
-        v-bind="$attrs"
+        :class="inputClass"
         @input="handleInput"
         @blur="handleBlur"
         @focus="handleFocus"
+        v-bind="$attrs"
       />
       
-      <div v-if="suffixIcon || $slots.suffix" class="input-suffix">
-        <slot name="suffix">
-          <span v-if="suffixIcon" class="input-icon">{{ suffixIcon }}</span>
-        </slot>
+      <div v-if="$slots.suffix" class="base-input-suffix">
+        <slot name="suffix" />
       </div>
     </div>
     
-    <div v-if="helpText && !errorMessage" class="form-help">
-      {{ helpText }}
+    <div v-if="hint" class="base-input-hint">
+      {{ hint }}
     </div>
     
-    <div v-if="errorMessage" class="form-error">
-      {{ errorMessage }}
+    <div v-if="error" class="base-input-error">
+      {{ error }}
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, useId } from 'vue'
+import { computed, useId } from 'vue'
 
 interface Props {
   modelValue?: string | number
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+  type?: 'text' | 'email' | 'password' | 'tel' | 'url' | 'number' | 'date' | 'time' | 'datetime-local'
   label?: string
   placeholder?: string
-  helpText?: string
-  errorMessage?: string
+  hint?: string
+  error?: string
   disabled?: boolean
   readonly?: boolean
   required?: boolean
-  min?: number
-  max?: number
-  step?: number
+  min?: number | string
+  max?: number | string
+  step?: number | string
   minLength?: number
   maxLength?: number
   pattern?: string
   autocomplete?: string
-  size?: 'sm' | 'md' | 'lg'
-  prefixIcon?: string
-  suffixIcon?: string
+  groupClass?: string
+  inputClass?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   readonly: false,
-  required: false,
-  size: 'md'
+  required: false
 })
 
 const emit = defineEmits<{
@@ -90,39 +80,7 @@ const emit = defineEmits<{
   focus: [event: FocusEvent]
 }>()
 
-const inputRef = ref<HTMLInputElement>()
 const inputId = useId()
-
-const hasError = computed(() => !!props.errorMessage)
-const hasSuccess = computed(() => !hasError.value && props.modelValue && props.modelValue.toString().length > 0)
-
-const wrapperClasses = computed(() => {
-  const classes = ['input-wrapper']
-  
-  if (props.prefixIcon || props.$slots?.prefix) {
-    classes.push('has-prefix')
-  }
-  
-  if (props.suffixIcon || props.$slots?.suffix) {
-    classes.push('has-suffix')
-  }
-  
-  return classes
-})
-
-const inputClasses = computed(() => {
-  const classes = ['form-input']
-  
-  if (props.size !== 'md') {
-    classes.push(`form-input-${props.size}`)
-  }
-  
-  if (hasError.value) {
-    classes.push('error')
-  }
-  
-  return classes
-})
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -137,66 +95,87 @@ const handleBlur = (event: FocusEvent) => {
 const handleFocus = (event: FocusEvent) => {
   emit('focus', event)
 }
-
-const focus = () => {
-  inputRef.value?.focus()
-}
-
-const blur = () => {
-  inputRef.value?.blur()
-}
-
-defineExpose({
-  focus,
-  blur
-})
 </script>
 
 <style scoped>
-.input-wrapper {
+.base-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.base-input-label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.required-asterisk {
+  color: #dc2626;
+  margin-left: 2px;
+}
+
+.base-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
 }
 
-.input-wrapper.has-prefix .form-input {
-  padding-left: 2.5rem;
+.base-input-wrapper input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
 }
 
-.input-wrapper.has-suffix .form-input {
-  padding-right: 2.5rem;
+.base-input-wrapper input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.input-prefix,
-.input-suffix {
+.base-input-wrapper input:disabled {
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.base-input-wrapper input:read-only {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.base-input-wrapper input.error {
+  border-color: #dc2626;
+}
+
+.base-input-suffix {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 12px;
   display: flex;
   align-items: center;
-  color: var(--color-gray-400);
-  pointer-events: none;
+  color: #6b7280;
 }
 
-.input-prefix {
-  left: 0.75rem;
+.base-input-hint {
+  font-size: 12px;
+  color: #6b7280;
 }
 
-.input-suffix {
-  right: 0.75rem;
+.base-input-error {
+  font-size: 12px;
+  color: #dc2626;
 }
 
-.input-icon {
-  font-size: 1rem;
+/* Input states */
+.base-input-wrapper input.error {
+  border-color: #dc2626;
 }
 
-.form-input-sm {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-}
-
-.form-input-lg {
-  padding: 0.75rem 1rem;
-  font-size: 1.125rem;
+.base-input-wrapper input.error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
 }
 </style>

@@ -1,58 +1,83 @@
 <template>
-  <div class="client-page">
-    <div class="client-header">
-      <h1>Настройки</h1>
-      <p>Управление настройками вашего аккаунта</p>
-    </div>
-
-    <div class="settings-container">
-      <div class="settings-section">
-        <h2>Профиль</h2>
-        <form @submit.prevent="updateProfile" class="settings-form">
-          <div class="form-group">
-            <label>Имя</label>
-            <input v-model="profileForm.first_name" type="text" required />
-          </div>
-          <div class="form-group">
-            <label>Фамилия</label>
-            <input v-model="profileForm.last_name" type="text" required />
-          </div>
-          <div class="form-group">
-            <label>Email</label>
-            <input v-model="profileForm.email" type="email" required />
-          </div>
-          <button type="submit" class="btn-primary" :disabled="isLoading">
-            {{ isLoading ? 'Сохранение...' : 'Сохранить' }}
-          </button>
-        </form>
+  <div class="universal-page">
+    <div class="universal-page-content">
+      <div class="universal-page-header">
+        <h1>Настройки</h1>
+        <p>Управление настройками вашего аккаунта</p>
       </div>
 
-      <div class="settings-section">
-        <h2>Смена пароля</h2>
-        <form @submit.prevent="changePassword" class="settings-form">
-          <div class="form-group">
-            <label>Текущий пароль</label>
-            <input v-model="passwordForm.currentPassword" type="password" required />
+      <div class="universal-settings-container">
+        <div class="universal-settings-nav">
+          <h2>Настройки</h2>
+          <div class="universal-nav-links">
+            <NuxtLink to="/client/settings" class="universal-nav-link" active-class="universal-nav-link--active">
+              Профиль
+            </NuxtLink>
+            <NuxtLink to="/client/settings/channels" class="universal-nav-link" active-class="universal-nav-link--active">
+              Каналы
+            </NuxtLink>
+            <NuxtLink to="/client/settings/languages" class="universal-nav-link" active-class="universal-nav-link--active">
+              Языки
+            </NuxtLink>
+            <NuxtLink to="/client/settings/schedule" class="universal-nav-link" active-class="universal-nav-link--active">
+              Расписание
+            </NuxtLink>
+            <NuxtLink to="/client/settings/widget" class="universal-nav-link" active-class="universal-nav-link--active">
+              Виджет
+            </NuxtLink>
           </div>
-          <div class="form-group">
-            <label>Новый пароль</label>
-            <input v-model="passwordForm.newPassword" type="password" required minlength="8" />
-          </div>
-          <div class="form-group">
-            <label>Подтвердите пароль</label>
-            <input v-model="passwordForm.confirmPassword" type="password" required />
-          </div>
-          <button type="submit" class="btn-primary" :disabled="isLoading">
-            {{ isLoading ? 'Смена пароля...' : 'Сменить пароль' }}
-          </button>
-        </form>
-      </div>
-    </div>
+        </div>
 
-    <div class="back-section">
-      <button class="btn-secondary" @click="$router.push('/client/dashboard')">
-        ← Назад к панели
-      </button>
+        <div class="universal-settings-content">
+          <div class="universal-settings-section">
+            <h2>Профиль</h2>
+            <form @submit.prevent="updateProfile" class="settings-form">
+              <div class="form-group">
+                <label>Имя</label>
+                <input v-model="profileForm.first_name" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>Фамилия</label>
+                <input v-model="profileForm.last_name" type="text" required />
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input v-model="profileForm.email" type="email" required />
+              </div>
+              <button type="submit" class="btn-primary" :disabled="isLoading">
+                {{ isLoading ? 'Сохранение...' : 'Сохранить' }}
+              </button>
+            </form>
+          </div>
+
+          <div class="universal-settings-section">
+            <h2>Смена пароля</h2>
+            <form @submit.prevent="changePassword" class="settings-form">
+              <div class="form-group">
+                <label>Текущий пароль</label>
+                <input v-model="passwordForm.currentPassword" type="password" required />
+              </div>
+              <div class="form-group">
+                <label>Новый пароль</label>
+                <input v-model="passwordForm.newPassword" type="password" required minlength="8" />
+              </div>
+              <div class="form-group">
+                <label>Подтвердите пароль</label>
+                <input v-model="passwordForm.confirmPassword" type="password" required />
+              </div>
+              <button type="submit" class="btn-primary" :disabled="isLoading">
+                {{ isLoading ? 'Смена пароля...' : 'Сменить пароль' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="back-section">
+        <button class="btn-secondary" @click="$router.push('/client/dashboard')">
+          ← Назад к панели
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -114,26 +139,11 @@ const changePassword = async () => {
 }
 </script>
 
-<style src="~/assets/css/client/index.css"></style>
 <style scoped>
-.settings-container {
-  max-width: 800px;
-  margin: 0 auto;
-}
+/* Import universal styles */
+@import '~/assets/css/shared/pages.css';
 
-.settings-section {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
-}
-
-.settings-section h2 {
-  color: var(--client-primary);
-  margin-bottom: 1.5rem;
-}
-
+/* Settings-specific styles */
 .settings-form {
   display: grid;
   gap: 1rem;
@@ -147,7 +157,7 @@ const changePassword = async () => {
 .form-group label {
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: var(--client-text-primary);
+  color: var(--color-gray-700);
 }
 
 .form-group input {
@@ -159,7 +169,7 @@ const changePassword = async () => {
 
 .form-group input:focus {
   outline: none;
-  border-color: var(--client-primary);
+  border-color: var(--color-primary);
 }
 
 .btn-secondary {

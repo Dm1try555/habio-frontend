@@ -84,6 +84,7 @@ const handleSubmit = async () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          project_id: props.projectId,
           channel: 6, // Оставить заявку
           contact: `${form.value.name} <${form.value.email}>`,
           message: `Телефон: ${form.value.phone}\n\n${form.value.message}`,

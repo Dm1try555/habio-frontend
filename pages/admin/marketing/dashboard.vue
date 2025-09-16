@@ -14,11 +14,6 @@
           <NuxtLink class="btn-primary" to="/admin/marketing/channels">Перейти</NuxtLink>
         </div>
         <div class="action-card">
-          <h3>Проекты</h3>
-          <p>Управление проектами</p>
-          <NuxtLink class="btn-primary" to="/admin/marketing/projects">Перейти</NuxtLink>
-        </div>
-        <div class="action-card">
           <h3>Настройки</h3>
           <p>Параметры системы</p>
           <NuxtLink class="btn-primary" to="/admin/marketing/settings">Перейти</NuxtLink>

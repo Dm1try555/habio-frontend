@@ -83,6 +83,7 @@ const startChat = async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        project_id: props.projectId,
         client_id: getClientId(),
         page_url: window.location.href
       })
@@ -111,7 +112,7 @@ const sendMessage = async () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        client_id: getClientId(),
+        session_id: sessionId.value,
         content: messageText,
         message_type: 'user'
       })

@@ -1,10 +1,5 @@
 // Admin composables
 export { useAuth } from './useAdminAuth'
 export { useUsers } from './useAdminUsers'
-export { useProjects } from './useAdminProjects'
-export { useChannels } from './useAdminChannels'
-export { useLeads } from './useAdminLeads'
-export { useSchedules } from './useSchedules'
 export { useABTests } from './useABTests'
 export { useSettings } from './useSettings'
-export { useChat } from './useChat'

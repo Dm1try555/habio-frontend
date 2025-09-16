@@ -131,6 +131,30 @@ export const useSubscription = () => {
     }
   }
 
+  // Client plan checking from localStorage
+  const getClientPlan = () => {
+    if (typeof window === 'undefined') return 'free'
+    const userRaw = localStorage.getItem('client_user')
+    if (!userRaw) return 'free'
+    try {
+      const user = JSON.parse(userRaw)
+      return user.plan || 'free'
+    } catch {
+      return 'free'
+    }
+  }
+
+  const isClientFree = computed(() => getClientPlan() === 'free')
+  const isClientPro = computed(() => getClientPlan() === 'pro')
+
+  const canAccessFeature = (feature: 'languages' | 'advanced_analytics' | 'unlimited_projects') => {
+    const plan = getClientPlan()
+    if (feature === 'languages') return plan === 'pro'
+    if (feature === 'advanced_analytics') return plan === 'pro'
+    if (feature === 'unlimited_projects') return plan === 'pro'
+    return true
+  }
+
   return {
     currentPlan,
     paymentMethods,
@@ -144,6 +168,10 @@ export const useSubscription = () => {
     cancelSubscription,
     addPaymentMethod,
     removePaymentMethod,
-    getAvailablePlans
+    getAvailablePlans,
+    getClientPlan,
+    isClientFree,
+    isClientPro,
+    canAccessFeature
   }
 }
